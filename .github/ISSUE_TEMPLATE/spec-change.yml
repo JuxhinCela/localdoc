@@ -1,0 +1,23 @@
+name: Spec change
+description: Propose a change to the LocalDoc format or conformance rules.
+title: "spec: "
+labels: ["spec"]
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility impact
+      description: Does this affect existing fixtures, schemas, or adapters?
+    validations:
+      required: true
+  - type: textarea
+    id: conformance
+    attributes:
+      label: Conformance updates
+      description: Which tests or fixtures should be added?

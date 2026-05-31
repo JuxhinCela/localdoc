@@ -1,0 +1,24 @@
+name: Adapter request
+description: Propose or improve an import/export adapter.
+title: "adapter: "
+labels: ["adapter"]
+body:
+  - type: input
+    id: ecosystem
+    attributes:
+      label: Ecosystem
+      description: Example: Tiptap, ProseMirror, Lexical, Slate, Pandoc.
+    validations:
+      required: true
+  - type: textarea
+    id: support
+    attributes:
+      label: Desired support
+      description: Which blocks, marks, assets, or custom content should round-trip?
+    validations:
+      required: true
+  - type: textarea
+    id: losses
+    attributes:
+      label: Known losses
+      description: What cannot be represented exactly?

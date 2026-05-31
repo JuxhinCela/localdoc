@@ -1,6 +1,6 @@
 {
   "name": "localdoc",
-  "version": "0.2.0-alpha.0",
+  "version": "0.2.0-alpha.1",
   "description": "Open local-first document package format, SDK, CLI, and conformance suite.",
   "type": "module",
   "bin": {

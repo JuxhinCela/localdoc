@@ -1,0 +1,14 @@
+{
+  "localdoc": "0.1.0",
+  "title": "Portable Note",
+  "createdAt": "2026-05-31T00:00:00.000Z",
+  "updatedAt": "2026-05-31T00:00:00.000Z",
+  "generator": {
+    "name": "localdoc-fixture",
+    "version": "0.1.0"
+  },
+  "metadata": {
+    "fixture": true,
+    "editor": "compatibility-suite"
+  }
+}

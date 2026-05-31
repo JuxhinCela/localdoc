@@ -1,0 +1,47 @@
+{
+  "name": "localdoc",
+  "version": "0.1.0",
+  "description": "Open protocol and SDK for AI-generated personal word processors.",
+  "type": "module",
+  "bin": {
+    "localdoc": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "ROADMAP.md",
+    "SECURITY.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm run test && npm run build",
+    "localdoc": "tsx src/cli.ts"
+  },
+  "keywords": [
+    "documents",
+    "local-first",
+    "word-processor",
+    "ai",
+    "interchange",
+    "markdown",
+    "html",
+    "open-format"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "marked": "^18.0.4",
+    "node-html-parser": "^7.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
+  }
+}

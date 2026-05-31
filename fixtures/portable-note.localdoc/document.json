@@ -1,0 +1,56 @@
+{
+  "type": "document",
+  "version": "0.1.0",
+  "blocks": [
+    {
+      "type": "heading",
+      "level": 1,
+      "children": [
+        {
+          "type": "text",
+          "text": "Portable Note"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "This document can move between personal editors."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "Local"
+        },
+        {
+          "type": "text",
+          "text": " documents stay user-owned.",
+          "marks": [
+            {
+              "type": "bold"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "custom",
+      "kind": "research-note",
+      "data": {
+        "source": "synthetic",
+        "confidence": "demo"
+      }
+    }
+  ],
+  "metadata": {
+    "unknownEditorState": {
+      "sidebarOpen": true
+    }
+  }
+}

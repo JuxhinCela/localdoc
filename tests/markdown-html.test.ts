@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   fromHtml,
+  fromHtmlWithLosses,
   fromMarkdown,
+  fromMarkdownWithLosses,
   toHtml,
+  toHtmlWithLosses,
   toMarkdown,
+  toMarkdownWithLosses,
   validateProject
 } from "../src/index.js";
 
@@ -44,6 +48,23 @@ describe("Markdown and HTML conversion", () => {
     expect(toMarkdown(project)).toContain('![Diagram](assets/diagram.png "System map")');
   });
 
+  it("reports conversion losses for custom blocks with fallbacks", () => {
+    const project = fromMarkdownWithLosses("<section>Unsupported</section>", {
+      now: "2026-05-31T00:00:00.000Z"
+    }).value;
+
+    const markdownResult = toMarkdownWithLosses(project);
+    const htmlResult = toHtmlWithLosses(project);
+
+    expect(project.document.blocks[0]).toMatchObject({
+      type: "custom",
+      namespace: "localdoc.dev/markdown",
+      name: "html"
+    });
+    expect(markdownResult.losses[0]?.feature).toBe("custom-block");
+    expect(htmlResult.losses[0]?.feature).toBe("custom-block");
+  });
+
   it("converts HTML to LocalDoc and back", () => {
     const project = fromHtml(
       [
@@ -67,5 +88,14 @@ describe("Markdown and HTML conversion", () => {
     expect(html).toContain("<h1>Research Notes</h1>");
     expect(html).toContain("<strong>Local</strong>");
     expect(html).toContain('<a href="https://example.com">sources</a>');
+  });
+
+  it("returns lossless wrappers for direct HTML imports", () => {
+    const result = fromHtmlWithLosses("<p>Hello</p>", {
+      now: "2026-05-31T00:00:00.000Z"
+    });
+
+    expect(result.losses).toEqual([]);
+    expect(validateProject(result.value).ok).toBe(true);
   });
 });

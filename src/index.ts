@@ -1,5 +1,8 @@
 export { LOCALDOC_FORMAT_VERSION } from "./types.js";
 export type {
+  ConversionLoss,
+  ConversionLossSeverity,
+  ConversionResult,
   CreateProjectInput,
   HtmlOptions,
   JsonObject,
@@ -18,10 +21,20 @@ export type {
   MarkdownOptions,
   ValidationResult
 } from "./types.js";
+export type {
+  LocalDocAdapter,
+  LocalDocReadOptions,
+  LocalDocReadResult,
+  LocalDocWriteOptions,
+  LocalDocWriteResult
+} from "./adapter.js";
 export { createProject } from "./project.js";
 export { readProject, writeProject } from "./project-io.js";
-export { fromMarkdown, toMarkdown } from "./markdown.js";
-export { fromHtml, toHtml } from "./html.js";
+export type { ConformanceCheck, ConformanceReport, ConformanceStatus } from "./conformance.js";
+export { runConformance } from "./conformance.js";
+export { fromMarkdown, fromMarkdownWithLosses, toMarkdown, toMarkdownWithLosses } from "./markdown.js";
+export { fromHtml, fromHtmlWithLosses, toHtml, toHtmlWithLosses } from "./html.js";
+export { validateProjectWithSchemas } from "./schema-validation.js";
 export {
   LocalDocValidationError,
   assertValidProject,

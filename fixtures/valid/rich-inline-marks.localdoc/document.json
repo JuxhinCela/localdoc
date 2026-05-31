@@ -1,0 +1,31 @@
+{
+  "type": "document",
+  "version": "0.2",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "Bold",
+          "marks": [{ "type": "bold" }]
+        },
+        {
+          "type": "text",
+          "text": ", italic",
+          "marks": [{ "type": "italic" }]
+        },
+        {
+          "type": "text",
+          "text": ", code",
+          "marks": [{ "type": "code" }]
+        },
+        {
+          "type": "text",
+          "text": ", and link",
+          "marks": [{ "type": "link", "href": "https://example.com" }]
+        }
+      ]
+    }
+  ]
+}

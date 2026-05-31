@@ -21,14 +21,28 @@ export function addResearchNote(view: ResearchNotesView, sourceId: string, quote
   view.notes.push({ sourceId, quote });
   view.project.document.blocks.push({
     type: "custom",
-    kind: "research-note",
-    data: { sourceId, quote }
+    namespace: "localdoc.dev/examples/research",
+    name: "research-note",
+    data: { sourceId, quote },
+    fallback: {
+      type: "quote",
+      children: [
+        {
+          type: "paragraph",
+          children: [{ type: "text", text: quote }]
+        }
+      ]
+    }
   });
 }
 
 function extractResearchNotes(blocks: LocalDocBlock[]): Array<{ sourceId: string; quote: string }> {
   return blocks.flatMap((block) => {
-    if (block.type !== "custom" || block.kind !== "research-note") {
+    if (
+      block.type !== "custom" ||
+      block.namespace !== "localdoc.dev/examples/research" ||
+      block.name !== "research-note"
+    ) {
       return [];
     }
 

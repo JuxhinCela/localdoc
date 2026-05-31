@@ -1,4 +1,5 @@
-export const LOCALDOC_FORMAT_VERSION = "0.1.0" as const;
+export const LOCALDOC_FORMAT_VERSION = "0.2" as const;
+export const LOCALDOC_PACKAGE_VERSION = "0.2.0-alpha.0" as const;
 
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | JsonObject | JsonValue[];
@@ -12,6 +13,7 @@ export interface LocalDocGenerator {
 
 export interface LocalDocManifest {
   localdoc: typeof LOCALDOC_FORMAT_VERSION;
+  id: string;
   title: string;
   createdAt: string;
   updatedAt: string;
@@ -108,12 +110,15 @@ export type LocalDocBlock =
     }
   | {
       type: "custom";
-      kind: string;
+      namespace: string;
+      name: string;
       data: JsonValue;
+      fallback?: Exclude<LocalDocBlock, { type: "custom" }>;
       metadata?: JsonObject;
     };
 
 export interface CreateProjectInput {
+  id?: string;
   title?: string;
   blocks?: LocalDocBlock[];
   generator?: LocalDocGenerator;
@@ -125,6 +130,20 @@ export interface CreateProjectInput {
 export interface ValidationResult {
   ok: boolean;
   errors: string[];
+}
+
+export type ConversionLossSeverity = "info" | "warning" | "error";
+
+export interface ConversionLoss {
+  severity: ConversionLossSeverity;
+  path: string;
+  feature: string;
+  message: string;
+}
+
+export interface ConversionResult<T> {
+  value: T;
+  losses: ConversionLoss[];
 }
 
 export interface MarkdownOptions {

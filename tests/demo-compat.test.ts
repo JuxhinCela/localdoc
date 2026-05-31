@@ -39,6 +39,13 @@ describe("demo compatibility", () => {
     const loaded = await readProject(projectPath);
     expect(validateProject(loaded).ok).toBe(true);
     expect(loaded.document.metadata).toEqual({ minimalWriterCursor: 14 });
-    expect(loaded.document.blocks.some((block) => block.type === "custom")).toBe(true);
+    expect(
+      loaded.document.blocks.some(
+        (block) =>
+          block.type === "custom" &&
+          block.namespace === "localdoc.dev/examples/research" &&
+          block.name === "research-note"
+      )
+    ).toBe(true);
   });
 });

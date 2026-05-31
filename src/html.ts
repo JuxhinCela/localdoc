@@ -1,6 +1,8 @@
 import { parse, type HTMLElement, type Node as HtmlNode } from "node-html-parser";
 import { createProject } from "./project.js";
 import type {
+  ConversionResult,
+  ConversionLoss,
   HtmlOptions,
   JsonValue,
   LocalDocBlock,
@@ -11,18 +13,40 @@ import type {
 } from "./types.js";
 
 export function fromHtml(html: string, options: HtmlOptions = {}): LocalDocProject {
+  return fromHtmlWithLosses(html, options).value;
+}
+
+export function fromHtmlWithLosses(
+  html: string,
+  options: HtmlOptions = {}
+): ConversionResult<LocalDocProject> {
   const root = parse(html);
   const body = root.querySelector("body") ?? root;
 
-  return createProject({
-    title: options.title ?? root.querySelector("title")?.textContent.trim() ?? "Untitled document",
-    blocks: nodesToBlocks(body.childNodes),
-    generator: options.generator ?? { name: "localdoc-html", version: "0.1.0" },
-    now: options.now
-  });
+  return {
+    value: createProject({
+      title: options.title ?? root.querySelector("title")?.textContent.trim() ?? "Untitled document",
+      blocks: nodesToBlocks(body.childNodes),
+      generator: options.generator ?? { name: "localdoc-html", version: "0.2.0-alpha.0" },
+      now: options.now
+    }),
+    losses: []
+  };
 }
 
 export function toHtml(project: LocalDocProject): string {
+  return toHtmlWithLosses(project).value;
+}
+
+export function toHtmlWithLosses(project: LocalDocProject): ConversionResult<string> {
+  const losses = collectHtmlLosses(project.document.blocks);
+  return {
+    value: renderHtmlDocument(project),
+    losses
+  };
+}
+
+function renderHtmlDocument(project: LocalDocProject): string {
   const title = escapeHtml(project.manifest.title);
   const body = project.document.blocks.map(renderHtmlBlock).join("\n");
 
@@ -38,6 +62,23 @@ export function toHtml(project: LocalDocProject): string {
     "</body>",
     "</html>"
   ].join("\n");
+}
+
+function collectHtmlLosses(blocks: LocalDocBlock[]): ConversionLoss[] {
+  return blocks.flatMap((block, index) => {
+    if (block.type !== "custom") {
+      return block.type === "quote" ? collectHtmlLosses(block.children) : [];
+    }
+
+    return [
+      {
+        severity: "warning" as const,
+        path: `/document/blocks/${index}`,
+        feature: "custom-block",
+        message: `Custom block ${block.namespace}/${block.name} is rendered with fallback HTML.`
+      }
+    ];
+  });
 }
 
 function nodesToBlocks(nodes: HtmlNode[]): LocalDocBlock[] {
@@ -113,11 +154,18 @@ function nodeToBlocks(node: HtmlNode): LocalDocBlock[] {
       ];
     case "div":
       if (node.hasAttribute("data-localdoc-custom")) {
+        const namespace = node.getAttribute("data-localdoc-namespace") ?? "localdoc.dev/html";
+        const name = node.getAttribute("data-localdoc-name") ?? "custom";
         return [
           {
             type: "custom",
-            kind: node.getAttribute("data-localdoc-custom") ?? "html-custom",
-            data: parseCustomData(node.textContent)
+            namespace,
+            name,
+            data: parseCustomData(node.textContent),
+            fallback: {
+              type: "paragraph",
+              children: [{ type: "text", text: "[Unsupported custom HTML block]" }]
+            }
           }
         ];
       }
@@ -210,9 +258,13 @@ function renderHtmlBlock(block: LocalDocBlock): string {
         block.title ? ` title="${escapeAttribute(block.title)}"` : ""
       }>`;
     case "custom":
-      return `<div data-localdoc-custom="${escapeAttribute(block.kind)}" hidden>${escapeHtml(
-        JSON.stringify(block.data)
-      )}</div>`;
+      return block.fallback
+        ? renderHtmlBlock(block.fallback)
+        : `<div data-localdoc-custom data-localdoc-namespace="${escapeAttribute(
+            block.namespace
+          )}" data-localdoc-name="${escapeAttribute(block.name)}" hidden>${escapeHtml(
+            JSON.stringify(block.data)
+          )}</div>`;
   }
 }
 

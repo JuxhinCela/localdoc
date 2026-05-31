@@ -44,6 +44,23 @@ describe("CLI", () => {
     expect(stderr.join("")).toBe("");
   });
 
+  it("prints validation JSON", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "localdoc-cli-json-"));
+    tempDirs.push(dir);
+    const projectPath = join(dir, "owned.localdoc");
+    const stdout: string[] = [];
+
+    expect(await main(["init", projectPath, "--title", "Owned Docs"], quietIo())).toBe(0);
+    expect(
+      await main(["validate", projectPath, "--json"], {
+        stdout: (value) => stdout.push(value),
+        stderr: () => undefined
+      })
+    ).toBe(0);
+
+    expect(JSON.parse(stdout.join(""))).toEqual({ status: "pass", errors: [] });
+  });
+
   it("converts Markdown to LocalDoc to HTML", async () => {
     const dir = await mkdtemp(join(tmpdir(), "localdoc-convert-"));
     tempDirs.push(dir);
@@ -59,6 +76,21 @@ describe("CLI", () => {
     const html = await readFile(htmlPath, "utf8");
     expect(html).toContain("<h1>Portable</h1>");
     expect(html).toContain("<strong>editors</strong>");
+  });
+
+  it("runs conformance checks", async () => {
+    const stdout: string[] = [];
+
+    expect(
+      await main(["conformance", "--json"], {
+        stdout: (value) => stdout.push(value),
+        stderr: () => undefined
+      })
+    ).toBe(0);
+
+    const report = JSON.parse(stdout.join(""));
+    expect(report.suite).toBe("localdoc-core-v0.2");
+    expect(report.status).toBe("pass");
   });
 });
 

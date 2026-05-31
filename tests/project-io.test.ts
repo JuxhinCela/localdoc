@@ -23,8 +23,13 @@ describe("project IO", () => {
     });
     project.document.blocks.push({
       type: "custom",
-      kind: "editor-state",
-      data: { panel: "notes" }
+      namespace: "example.com/editor",
+      name: "state",
+      data: { panel: "notes" },
+      fallback: {
+        type: "paragraph",
+        children: [{ type: "text", text: "[Editor state]" }]
+      }
     });
 
     await writeProject(projectPath, project);
@@ -35,8 +40,13 @@ describe("project IO", () => {
     expect(loaded.document.metadata).toEqual({ unknownEditorState: { mode: "focus" } });
     expect(loaded.document.blocks[0]).toEqual({
       type: "custom",
-      kind: "editor-state",
-      data: { panel: "notes" }
+      namespace: "example.com/editor",
+      name: "state",
+      data: { panel: "notes" },
+      fallback: {
+        type: "paragraph",
+        children: [{ type: "text", text: "[Editor state]" }]
+      }
     });
   });
 });

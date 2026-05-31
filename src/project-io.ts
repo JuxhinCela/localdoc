@@ -3,16 +3,22 @@ import { join } from "node:path";
 import { assertValidProject } from "./validation.js";
 import type { LocalDocProject } from "./types.js";
 
-export async function readProject(projectPath: string): Promise<LocalDocProject> {
+export async function readProjectFiles(
+  projectPath: string
+): Promise<{ manifest: unknown; document: unknown }> {
   const [manifestRaw, documentRaw] = await Promise.all([
     readFile(join(projectPath, "manifest.json"), "utf8"),
     readFile(join(projectPath, "document.json"), "utf8")
   ]);
 
-  const project = {
+  return {
     manifest: JSON.parse(manifestRaw) as unknown,
     document: JSON.parse(documentRaw) as unknown
   };
+}
+
+export async function readProject(projectPath: string): Promise<LocalDocProject> {
+  const project = await readProjectFiles(projectPath);
 
   assertValidProject(project);
   return project;

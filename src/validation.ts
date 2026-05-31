@@ -35,6 +35,9 @@ export function validateProject(project: unknown): ValidationResult {
     if (manifest.localdoc !== LOCALDOC_FORMAT_VERSION) {
       errors.push(`manifest.localdoc must be "${LOCALDOC_FORMAT_VERSION}".`);
     }
+    if (!isNonEmptyString(manifest.id)) {
+      errors.push("manifest.id must be a non-empty string.");
+    }
     if (!isNonEmptyString(manifest.title)) {
       errors.push("manifest.title must be a non-empty string.");
     }
@@ -155,6 +158,8 @@ function validateBlock(value: unknown, path: string, errors: string[]): void {
     case "image":
       if (!isNonEmptyString(value.src)) {
         errors.push(`${path}.src must be a non-empty string.`);
+      } else if (!isSafeReference(value.src)) {
+        errors.push(`${path}.src must be a safe relative asset path or http(s) URL.`);
       }
       if (value.alt !== undefined && typeof value.alt !== "string") {
         errors.push(`${path}.alt must be a string.`);
@@ -164,11 +169,17 @@ function validateBlock(value: unknown, path: string, errors: string[]): void {
       }
       return;
     case "custom":
-      if (!isNonEmptyString(value.kind)) {
-        errors.push(`${path}.kind must be a non-empty string.`);
+      if (!isNonEmptyString(value.namespace)) {
+        errors.push(`${path}.namespace must be a non-empty string.`);
+      }
+      if (!isNonEmptyString(value.name)) {
+        errors.push(`${path}.name must be a non-empty string.`);
       }
       if (!isJsonValue(value.data)) {
         errors.push(`${path}.data must be JSON-serializable.`);
+      }
+      if (value.fallback !== undefined) {
+        validateFallbackBlock(value.fallback, `${path}.fallback`, errors);
       }
       return;
     default:
@@ -289,6 +300,8 @@ function validateMark(value: unknown, path: string, errors: string[]): void {
     case "link":
       if (!isNonEmptyString(value.href)) {
         errors.push(`${path}.href must be a non-empty string.`);
+      } else if (!isSafeReference(value.href)) {
+        errors.push(`${path}.href must be a safe relative path or http(s) URL.`);
       }
       if (value.title !== undefined && typeof value.title !== "string") {
         errors.push(`${path}.title must be a string.`);
@@ -330,6 +343,36 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isIsoDate(value: unknown): value is string {
   return typeof value === "string" && !Number.isNaN(Date.parse(value));
+}
+
+function validateFallbackBlock(value: unknown, path: string, errors: string[]): void {
+  if (isRecord(value) && value.type === "custom") {
+    errors.push(`${path} must not be another custom block.`);
+    return;
+  }
+
+  validateBlock(value, path, errors);
+}
+
+function isSafeReference(value: string): boolean {
+  const lower = value.trim().toLowerCase();
+  if (
+    lower.length === 0 ||
+    lower.startsWith("javascript:") ||
+    lower.startsWith("data:") ||
+    lower.startsWith("file:") ||
+    lower.startsWith("/") ||
+    lower.includes("\\")
+  ) {
+    return false;
+  }
+
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return !value.split("/").some((part) => part === "..");
+  }
 }
 
 export function text(value: string, marks?: LocalDocMark[]): LocalDocInline {

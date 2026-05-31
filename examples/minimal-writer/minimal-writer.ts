@@ -11,7 +11,7 @@ export interface MinimalWriterView {
 export function createMinimalWriterProject(title: string, firstParagraph = ""): LocalDocProject {
   const project = createProject({
     title,
-    generator: { name: "localdoc-minimal-writer", version: "0.1.0" }
+    generator: { name: "localdoc-minimal-writer", version: "0.2.0-alpha.0" }
   });
 
   project.document.blocks.push({

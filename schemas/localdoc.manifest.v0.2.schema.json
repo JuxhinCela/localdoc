@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://localdoc.dev/schemas/localdoc.manifest.v0.2.schema.json",
+  "title": "LocalDoc Manifest v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["localdoc", "id", "title", "createdAt", "updatedAt"],
+  "properties": {
+    "localdoc": {
+      "const": "0.2"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^doc_[A-Za-z0-9._:-]+$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "metadata": {
+      "$ref": "localdoc.document.v0.2.schema.json#/$defs/jsonObject"
+    }
+  }
+}

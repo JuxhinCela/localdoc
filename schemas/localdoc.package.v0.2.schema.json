@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://localdoc.dev/schemas/localdoc.package.v0.2.schema.json",
+  "title": "LocalDoc Package v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest", "document"],
+  "properties": {
+    "manifest": {
+      "$ref": "localdoc.manifest.v0.2.schema.json"
+    },
+    "document": {
+      "$ref": "localdoc.document.v0.2.schema.json"
+    }
+  }
+}

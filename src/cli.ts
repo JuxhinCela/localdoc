@@ -3,10 +3,12 @@ import { readFile, stat, writeFile } from "node:fs/promises";
 import { extname } from "node:path";
 import { pathToFileURL } from "node:url";
 import { createProject } from "./project.js";
-import { readProject, writeProject } from "./project-io.js";
+import { readProject, readProjectFiles, writeProject } from "./project-io.js";
 import { fromHtml, toHtml } from "./html.js";
 import { fromMarkdown, toMarkdown } from "./markdown.js";
 import { validateProject } from "./validation.js";
+import { validateProjectWithSchemas } from "./schema-validation.js";
+import { runConformance } from "./conformance.js";
 import type { LocalDocProject } from "./types.js";
 
 interface CliIo {
@@ -27,6 +29,8 @@ export async function main(args = process.argv.slice(2), io: CliIo = {}): Promis
         return await inspectCommand(rest, stdout);
       case "validate":
         return await validateCommand(rest, stdout, stderr);
+      case "conformance":
+        return await conformanceCommand(rest, stdout, stderr);
       case "convert":
         return await convertCommand(rest, stdout);
       case "--help":
@@ -53,7 +57,7 @@ async function initCommand(args: string[], stdout: (value: string) => void): Pro
   const title = readOption(args, "--title") ?? "Untitled document";
   const project = createProject({
     title,
-    generator: { name: "localdoc-cli", version: "0.1.0" }
+    generator: { name: "localdoc-cli", version: "0.2.0-alpha.0" }
   });
 
   await writeProject(target, project);
@@ -85,20 +89,55 @@ async function validateCommand(
   stderr: (value: string) => void
 ): Promise<number> {
   const target = args[0];
+  const asJson = args.includes("--json");
   if (!target) {
-    throw new Error("Usage: localdoc validate <path>");
+    throw new Error("Usage: localdoc validate <path> [--json]");
   }
 
-  const project = await readProject(target);
+  const project = await readProjectFiles(target);
   const result = validateProject(project);
+  const schemaResult = result.ok
+    ? await validateProjectWithSchemas(project)
+    : { ok: false, errors: [] };
+  const errors = [...result.errors, ...schemaResult.errors];
 
-  if (result.ok) {
+  if (asJson) {
+    stdout(`${JSON.stringify({ status: errors.length === 0 ? "pass" : "fail", errors }, null, 2)}\n`);
+    return errors.length === 0 ? 0 : 1;
+  }
+
+  if (errors.length === 0) {
     stdout("LocalDoc project is valid.\n");
     return 0;
   }
 
-  stderr(`${result.errors.join("\n")}\n`);
+  stderr(`${errors.join("\n")}\n`);
   return 1;
+}
+
+async function conformanceCommand(
+  args: string[],
+  stdout: (value: string) => void,
+  stderr: (value: string) => void
+): Promise<number> {
+  const asJson = args.includes("--json");
+  const fixtureIndex = args.indexOf("--fixtures");
+  const fixturesDir = fixtureIndex >= 0 ? args[fixtureIndex + 1] : undefined;
+  const report = await runConformance({ fixturesDir });
+
+  if (asJson) {
+    stdout(`${JSON.stringify(report, null, 2)}\n`);
+  } else {
+    stdout(`LocalDoc conformance: ${report.status}\n`);
+    report.checks.forEach((check) => {
+      const line = `${check.status === "pass" ? "PASS" : "FAIL"} ${check.id}${
+        check.message ? ` - ${check.message}` : ""
+      }\n`;
+      (check.status === "pass" ? stdout : stderr)(line);
+    });
+  }
+
+  return report.status === "pass" ? 0 : 1;
 }
 
 async function convertCommand(args: string[], stdout: (value: string) => void): Promise<number> {
@@ -176,8 +215,9 @@ function helpText(): string {
 Usage:
   localdoc init <dir> --title "My Document"
   localdoc inspect <path>
-  localdoc validate <path>
+  localdoc validate <path> [--json]
   localdoc convert <input> <output>
+  localdoc conformance [--json] [--fixtures <dir>]
 
 Formats:
   Input:  .localdoc directory, .md, .markdown, .html, .htm, .json

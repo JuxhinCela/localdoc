@@ -1,0 +1,25 @@
+{
+  "type": "document",
+  "version": "0.2",
+  "blocks": [
+    {
+      "type": "heading",
+      "level": 1,
+      "children": [
+        {
+          "type": "text",
+          "text": "Basic Portable Note"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "This document can move between local-first editors."
+        }
+      ]
+    }
+  ]
+}

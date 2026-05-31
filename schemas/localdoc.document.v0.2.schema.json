@@ -1,0 +1,343 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://localdoc.dev/schemas/localdoc.document.v0.2.schema.json",
+  "title": "LocalDoc Document v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "version", "blocks"],
+  "properties": {
+    "type": {
+      "const": "document"
+    },
+    "version": {
+      "const": "0.2"
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/block"
+      }
+    },
+    "metadata": {
+      "$ref": "#/$defs/jsonObject"
+    }
+  },
+  "$defs": {
+    "jsonValue": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "null" },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        },
+        {
+          "$ref": "#/$defs/jsonObject"
+        }
+      ]
+    },
+    "jsonObject": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/jsonValue"
+      }
+    },
+    "safeReference": {
+      "type": "string",
+      "minLength": 1,
+      "not": {
+        "anyOf": [
+          { "pattern": "^/" },
+          { "pattern": "\\.\\." },
+          { "pattern": "\\\\" },
+          { "pattern": "^[Jj][Aa][Vv][Aa][Ss][Cc][Rr][Ii][Pp][Tt]:" },
+          { "pattern": "^[Dd][Aa][Tt][Aa]:" },
+          { "pattern": "^[Ff][Ii][Ll][Ee]:" }
+        ]
+      }
+    },
+    "mark": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "const": "bold"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "const": "italic"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "const": "underline"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "const": "code"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "href"],
+          "properties": {
+            "type": {
+              "const": "link"
+            },
+            "href": {
+              "$ref": "#/$defs/safeReference"
+            },
+            "title": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "inline": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "text"],
+          "properties": {
+            "type": {
+              "const": "text"
+            },
+            "text": {
+              "type": "string"
+            },
+            "marks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/mark"
+              }
+            },
+            "metadata": {
+              "$ref": "#/$defs/jsonObject"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "const": "hard_break"
+            },
+            "metadata": {
+              "$ref": "#/$defs/jsonObject"
+            }
+          }
+        }
+      ]
+    },
+    "inlineChildren": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/inline"
+      }
+    },
+    "listItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["children"],
+      "properties": {
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/block"
+          }
+        },
+        "metadata": {
+          "$ref": "#/$defs/jsonObject"
+        }
+      }
+    },
+    "tableCell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["children"],
+      "properties": {
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/block"
+          }
+        },
+        "metadata": {
+          "$ref": "#/$defs/jsonObject"
+        }
+      }
+    },
+    "tableRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cells"],
+      "properties": {
+        "cells": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tableCell"
+          }
+        },
+        "metadata": {
+          "$ref": "#/$defs/jsonObject"
+        }
+      }
+    },
+    "nonCustomBlock": {
+      "oneOf": [
+        { "$ref": "#/$defs/paragraphBlock" },
+        { "$ref": "#/$defs/headingBlock" },
+        { "$ref": "#/$defs/listBlock" },
+        { "$ref": "#/$defs/quoteBlock" },
+        { "$ref": "#/$defs/codeBlock" },
+        { "$ref": "#/$defs/tableBlock" },
+        { "$ref": "#/$defs/imageBlock" }
+      ]
+    },
+    "block": {
+      "oneOf": [
+        { "$ref": "#/$defs/nonCustomBlock" },
+        { "$ref": "#/$defs/customBlock" }
+      ]
+    },
+    "paragraphBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "children"],
+      "properties": {
+        "type": { "const": "paragraph" },
+        "children": { "$ref": "#/$defs/inlineChildren" },
+        "metadata": { "$ref": "#/$defs/jsonObject" }
+      }
+    },
+    "headingBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "level", "children"],
+      "properties": {
+        "type": { "const": "heading" },
+        "level": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "children": { "$ref": "#/$defs/inlineChildren" },
+        "metadata": { "$ref": "#/$defs/jsonObject" }
+      }
+    },
+    "listBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "ordered", "items"],
+      "properties": {
+        "type": { "const": "list" },
+        "ordered": { "type": "boolean" },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/listItem" }
+        },
+        "metadata": { "$ref": "#/$defs/jsonObject" }
+      }
+    },
+    "quoteBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "children"],
+      "properties": {
+        "type": { "const": "quote" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/block" }
+        },
+        "metadata": { "$ref": "#/$defs/jsonObject" }
+      }
+    },
+    "codeBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "text"],
+      "properties": {
+        "type": { "const": "code" },
+        "text": { "type": "string" },
+        "language": { "type": "string" },
+        "metadata": { "$ref": "#/$defs/jsonObject" }
+      }
+    },
+    "tableBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "rows"],
+      "properties": {
+        "type": { "const": "table" },
+        "rows": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/tableRow" }
+        },
+        "metadata": { "$ref": "#/$defs/jsonObject" }
+      }
+    },
+    "imageBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "src"],
+      "properties": {
+        "type": { "const": "image" },
+        "src": { "$ref": "#/$defs/safeReference" },
+        "alt": { "type": "string" },
+        "title": { "type": "string" },
+        "metadata": { "$ref": "#/$defs/jsonObject" }
+      }
+    },
+    "customBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "namespace", "name", "data"],
+      "properties": {
+        "type": { "const": "custom" },
+        "namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data": {
+          "$ref": "#/$defs/jsonValue"
+        },
+        "fallback": {
+          "$ref": "#/$defs/nonCustomBlock"
+        },
+        "metadata": {
+          "$ref": "#/$defs/jsonObject"
+        }
+      }
+    }
+  }
+}

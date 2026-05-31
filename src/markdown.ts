@@ -1,6 +1,8 @@
 import { marked } from "marked";
 import { createProject } from "./project.js";
 import type {
+  ConversionResult,
+  ConversionLoss,
   HtmlOptions,
   LocalDocBlock,
   LocalDocInline,
@@ -13,17 +15,56 @@ import type {
 type MarkedToken = Record<string, unknown>;
 
 export function fromMarkdown(markdown: string, options: MarkdownOptions = {}): LocalDocProject {
+  return fromMarkdownWithLosses(markdown, options).value;
+}
+
+export function fromMarkdownWithLosses(
+  markdown: string,
+  options: MarkdownOptions = {}
+): ConversionResult<LocalDocProject> {
   const tokens = marked.lexer(markdown) as MarkedToken[];
 
-  return createProject({
-    title: options.title ?? firstHeading(tokens) ?? "Untitled document",
-    blocks: tokensToBlocks(tokens),
-    generator: options.generator ?? { name: "localdoc-markdown", version: "0.1.0" },
-    now: options.now
-  });
+  return {
+    value: createProject({
+      title: options.title ?? firstHeading(tokens) ?? "Untitled document",
+      blocks: tokensToBlocks(tokens),
+      generator: options.generator ?? { name: "localdoc-markdown", version: "0.2.0-alpha.0" },
+      now: options.now
+    }),
+    losses: []
+  };
 }
 
 export function toMarkdown(project: LocalDocProject): string {
+  return toMarkdownWithLosses(project).value;
+}
+
+export function toMarkdownWithLosses(project: LocalDocProject): ConversionResult<string> {
+  const losses = collectMarkdownLosses(project.document.blocks);
+  return {
+    value: `${project.document.blocks.map(renderMarkdownBlock).join("\n\n").trim()}\n`,
+    losses
+  };
+}
+
+function collectMarkdownLosses(blocks: LocalDocBlock[]): ConversionLoss[] {
+  return blocks.flatMap((block, index) => {
+    if (block.type !== "custom") {
+      return block.type === "quote" ? collectMarkdownLosses(block.children) : [];
+    }
+
+    return [
+      {
+        severity: "warning" as const,
+        path: `/document/blocks/${index}`,
+        feature: "custom-block",
+        message: `Custom block ${block.namespace}/${block.name} is rendered as a fallback comment in Markdown.`
+      }
+    ];
+  });
+}
+
+export function renderMarkdown(project: LocalDocProject): string {
   return `${project.document.blocks.map(renderMarkdownBlock).join("\n\n").trim()}\n`;
 }
 
@@ -95,16 +136,26 @@ function tokenToBlocks(token: MarkedToken): LocalDocBlock[] {
       return [
         {
           type: "custom",
-          kind: "markdown-html",
-          data: { raw: String(token.raw ?? token.text ?? "") }
+          namespace: "localdoc.dev/markdown",
+          name: "html",
+          data: { raw: String(token.raw ?? token.text ?? "") },
+          fallback: {
+            type: "paragraph",
+            children: [{ type: "text", text: "[Unsupported HTML block]" }]
+          }
         }
       ];
     default:
       return [
         {
           type: "custom",
-          kind: `markdown-${String(token.type ?? "unknown")}`,
-          data: { raw: String(token.raw ?? "") }
+          namespace: "localdoc.dev/markdown",
+          name: String(token.type ?? "unknown"),
+          data: { raw: String(token.raw ?? "") },
+          fallback: {
+            type: "paragraph",
+            children: [{ type: "text", text: "[Unsupported Markdown block]" }]
+          }
         }
       ];
   }
@@ -294,7 +345,9 @@ function renderMarkdownBlock(block: LocalDocBlock): string {
         block.title ? ` "${block.title}"` : ""
       })`;
     case "custom":
-      return `<!-- localdoc-custom:${block.kind} ${JSON.stringify(block.data)} -->`;
+      return block.fallback
+        ? renderMarkdownBlock(block.fallback)
+        : `<!-- localdoc-custom:${block.namespace}/${block.name} ${JSON.stringify(block.data)} -->`;
   }
 }
 

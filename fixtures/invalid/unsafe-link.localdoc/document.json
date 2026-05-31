@@ -1,0 +1,16 @@
+{
+  "type": "document",
+  "version": "0.2",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "Unsafe",
+          "marks": [{ "type": "link", "href": "javascript:alert(1)" }]
+        }
+      ]
+    }
+  ]
+}

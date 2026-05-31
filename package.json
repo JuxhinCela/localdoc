@@ -1,13 +1,17 @@
 {
   "name": "localdoc",
-  "version": "0.1.0",
-  "description": "Open protocol and SDK for AI-generated personal word processors.",
+  "version": "0.2.0-alpha.0",
+  "description": "Open local-first document package format, SDK, CLI, and conformance suite.",
   "type": "module",
   "bin": {
     "localdoc": "./dist/cli.js"
   },
   "files": [
     "dist",
+    "docs",
+    "examples",
+    "fixtures",
+    "schemas",
     "README.md",
     "LICENSE",
     "ROADMAP.md",
@@ -23,9 +27,10 @@
   "keywords": [
     "documents",
     "local-first",
-    "word-processor",
+    "rich-text",
     "ai",
     "interchange",
+    "conformance",
     "markdown",
     "html",
     "open-format"
@@ -35,6 +40,8 @@
     "node": ">=20"
   },
   "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "marked": "^18.0.4",
     "node-html-parser": "^7.1.0"
   },

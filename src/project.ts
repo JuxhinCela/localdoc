@@ -1,5 +1,7 @@
+import { randomUUID } from "node:crypto";
 import {
   LOCALDOC_FORMAT_VERSION,
+  LOCALDOC_PACKAGE_VERSION,
   type CreateProjectInput,
   type LocalDocProject
 } from "./types.js";
@@ -10,10 +12,11 @@ export function createProject(input: CreateProjectInput = {}): LocalDocProject {
   return {
     manifest: {
       localdoc: LOCALDOC_FORMAT_VERSION,
+      id: input.id ?? `doc_${randomUUID()}`,
       title: input.title ?? "Untitled document",
       createdAt: now,
       updatedAt: now,
-      ...(input.generator ? { generator: input.generator } : {}),
+      generator: input.generator ?? { name: "localdoc", version: LOCALDOC_PACKAGE_VERSION },
       ...(input.metadata ? { metadata: input.metadata } : {})
     },
     document: {

@@ -1,0 +1,29 @@
+{
+  "type": "document",
+  "version": "0.2",
+  "blocks": [
+    {
+      "type": "custom",
+      "namespace": "example.com/research",
+      "name": "citation-card",
+      "data": {
+        "sourceId": "source-a",
+        "confidence": "synthetic"
+      },
+      "fallback": {
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "text",
+            "text": "[Citation card: source-a]"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "unknownEditorState": {
+      "panel": "research"
+    }
+  }
+}

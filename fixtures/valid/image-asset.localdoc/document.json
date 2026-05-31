@@ -1,0 +1,11 @@
+{
+  "type": "document",
+  "version": "0.2",
+  "blocks": [
+    {
+      "type": "image",
+      "src": "assets/diagram.txt",
+      "alt": "Synthetic diagram"
+    }
+  ]
+}

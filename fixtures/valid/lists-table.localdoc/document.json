@@ -1,0 +1,73 @@
+{
+  "type": "document",
+  "version": "0.2",
+  "blocks": [
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        {
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [{ "type": "text", "text": "Portable files" }]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [{ "type": "text", "text": "Independent editors" }]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "rows": [
+        {
+          "cells": [
+            {
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [{ "type": "text", "text": "Feature" }]
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [{ "type": "text", "text": "Support" }]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [{ "type": "text", "text": "Validation" }]
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [{ "type": "text", "text": "Core" }]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

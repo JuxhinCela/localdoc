@@ -1,30 +1,43 @@
 # LocalDoc
 
-**Build your own Word. Own your documents.**
+**Build local-first document editors. Own the files they create.**
 
-LocalDoc is an open protocol for personally owned word processors: local-first,
-AI-buildable, portable, and free from office-suite lock-in.
+LocalDoc is an open local-first document package format, TypeScript SDK, CLI,
+and conformance suite for portable rich-text documents.
 
-The future of documents should be personal, local, and portable. AI can now help
-anyone build a private writing app. LocalDoc makes sure those apps can still
-speak the same document language.
+AI can generate custom editors. LocalDoc gives those editors a shared
+interchange layer so documents remain portable between tools instead of getting
+trapped inside one app's private JSON.
 
-No single vendor should control how personal documents are created, stored, or
-moved.
+LocalDoc is not an editor framework, not a Word clone, and not a DOCX
+compatibility layer.
 
-## What It Is
+```text
+Markdown ─┐
+HTML ─────┤
+Tiptap ───┤
+          ▼
+      LocalDoc Core
+          ▲
+          ├── validators
+          ├── conformance suite
+          ├── adapters
+          └── browser demos
+```
 
-LocalDoc is the open document layer for people building their own writing tools.
-It gives AI-generated editors a shared project format, SDK, CLI, and conversion
-path so users are not trapped in one generated app.
+## What It Does
 
-LocalDoc v0.1 supports Markdown and HTML. It does not claim official
-compatibility with any office suite and does not implement DOCX yet.
+- Defines a `.localdoc/` package format for portable rich-text documents.
+- Validates packages with runtime checks and JSON Schema.
+- Converts Markdown and HTML to and from LocalDoc.
+- Reports conversion losses instead of pretending every format is lossless.
+- Provides a CLI for init, inspect, validate, convert, and conformance checks.
+- Preserves unknown custom blocks through a fallback-based extension model.
 
 ## Install
 
 ```bash
-npm install localdoc
+npm install localdoc@alpha
 ```
 
 For local development:
@@ -39,44 +52,49 @@ npm run check
 ```bash
 localdoc init ./my-note.localdoc --title "My Note"
 localdoc inspect ./my-note.localdoc
-localdoc validate ./my-note.localdoc
+localdoc validate ./my-note.localdoc --json
 localdoc convert ./README.md ./readme.localdoc
 localdoc convert ./readme.localdoc ./readme.html
+localdoc conformance --json
 ```
 
 During development, run the CLI from source:
 
 ```bash
-npm run localdoc -- init ./tmp/demo.localdoc --title "Demo"
+npm run localdoc -- conformance --json
 ```
 
 ## SDK
 
 ```ts
 import {
-  createProject,
-  fromMarkdown,
+  fromMarkdownWithLosses,
   readProject,
-  toHtml,
+  toHtmlWithLosses,
   validateProject,
+  validateProjectWithSchemas,
   writeProject
 } from "localdoc";
 
-const project = fromMarkdown("# My private editor\n\nHello from LocalDoc.", {
-  title: "My private editor"
-});
+const { value: project, losses } = fromMarkdownWithLosses(
+  "# My private editor\n\nHello from LocalDoc.",
+  { title: "My private editor" }
+);
 
-const result = validateProject(project);
-if (!result.ok) {
-  throw new Error(result.errors.join("\n"));
+if (losses.length > 0) {
+  console.warn(losses);
+}
+
+const runtimeResult = validateProject(project);
+const schemaResult = await validateProjectWithSchemas(project);
+if (!runtimeResult.ok || !schemaResult.ok) {
+  throw new Error([...runtimeResult.errors, ...schemaResult.errors].join("\n"));
 }
 
 await writeProject("./my-private-editor.localdoc", project);
 
 const loaded = await readProject("./my-private-editor.localdoc");
-console.log(toHtml(loaded));
-
-const empty = createProject({ title: "Blank document" });
+console.log(toHtmlWithLosses(loaded).value);
 ```
 
 ## Project Format
@@ -90,33 +108,46 @@ my-document.localdoc/
   assets/
 ```
 
-`manifest.json` stores project-level metadata:
+`manifest.json` stores package-level metadata:
 
 ```json
 {
-  "localdoc": "0.1.0",
+  "localdoc": "0.2",
+  "id": "doc_my_document",
   "title": "My Document",
   "createdAt": "2026-05-31T00:00:00.000Z",
   "updatedAt": "2026-05-31T00:00:00.000Z",
   "generator": {
     "name": "localdoc-cli",
-    "version": "0.1.0"
+    "version": "0.2.0-alpha.0"
   }
 }
 ```
 
-`document.json` stores portable blocks and inline marks. Unknown editor-specific
-data should live in `metadata` or `custom` blocks so another editor can preserve
-it even when it cannot render it.
+`document.json` stores portable blocks and inline marks. Unknown
+editor-specific content should use custom blocks with fallbacks so another
+editor can preserve the content even when it cannot render the full feature.
 
 ## Why This Exists
 
-AI makes it possible for every person, team, classroom, studio, or community to
-build a writing tool that fits them. But without an open protocol, every
-AI-generated editor becomes a new silo.
+People should be able to build writing tools that fit them without giving up
+file ownership or portability.
 
-LocalDoc is for a world where everyone can have a private, personal word
-processor, and still keep their documents portable.
+LocalDoc is for people who want their documents to outlive any one editor.
+
+## v0.2 Alpha Focus
+
+The current alpha is about proving protocol credibility:
+
+- formal spec docs
+- JSON Schemas
+- valid and invalid fixtures
+- conformance checks
+- conversion-loss reporting
+- extension preservation
+
+DOCX, ODT, collaboration, and full editor generation are intentionally out of
+scope for this phase.
 
 ## Examples
 
@@ -125,17 +156,6 @@ processor, and still keep their documents portable.
   links, and custom metadata.
 - `docs/AI_BUILDER_PROMPT.md`: a prompt template for generating a compatible
   local editor with AI.
-
-## Public Positioning
-
-GitHub description:
-
-> Open protocol and SDK for AI-generated personal word processors.
-
-Short pitch:
-
-> LocalDoc helps developers build private, user-owned document editors without
-> trapping users in one app or vendor format.
 
 ## License
 

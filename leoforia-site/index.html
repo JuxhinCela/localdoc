@@ -1,0 +1,1240 @@
+<!doctype html>
+<!--
+  ASSUMPTIONS (Leoforia is not yet public; see spec §0.1)
+  - Leoforia is presented as a real-time bus app for Greece: live bus positions and arrival minutes at stops,
+    nearby stops, favourites, line search, arrival alerts.
+  - Coverage assumption: Athens first (OASA/OSY buses and trolleys), then Thessaloniki (OASTH, operated by OSETH).
+  - Product claims that are proposals, not verified facts, carry a TODO-CLAIM comment where they appear:
+    disruption/strike alerts, lines and stops available without signal, Thessaloniki coverage at launch,
+    "only location while the app is open" (TODO-LEGAL).
+  - Placeholders (grep the tags): TODO-STORE (store URLs, App Store ID, PROVIDER_TOKEN, Smart App Banner id),
+    TODO-ASSET (og-image PNG, PNG favicons/manifest), TODO-BADGE (official badge artwork swap),
+    TODO-QR (real QR for https://www.leoforia.gr/get), TODO-LEGAL (entity, address, email, /privacy, /terms,
+    privacy answer), TODO-CLAIM (see above), TODO-RATING (trust chip and JSON-LD aggregateRating).
+-->
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Leoforia – Λεωφορεία live στην Αθήνα &amp; Θεσσαλονίκη</title>
+<meta name="description" content="Δες πού είναι το λεωφορείο σου και σε πόσα λεπτά έρχεται. Δωρεάν εφαρμογή για Αθήνα (ΟΑΣΑ) και Θεσσαλονίκη (ΟΑΣΘ).">
+<meta name="theme-color" content="#F4F6FB">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="format-detection" content="telephone=no">
+<link rel="canonical" href="https://www.leoforia.gr/">
+<!-- TODO-STORE: replace 0000000000 with the real App Store ID (Smart App Banner, Safari only) -->
+<meta name="apple-itunes-app" content="app-id=0000000000, app-argument=https://www.leoforia.gr/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Leoforia">
+<meta property="og:url" content="https://www.leoforia.gr/">
+<meta property="og:title" content="Leoforia – Πού είναι το λεωφορείο;">
+<meta property="og:description" content="Ξέρεις πότε έρχεται. Δωρεάν, για Αθήνα και Θεσσαλονίκη.">
+<!-- TODO-ASSET: host a 1200×630 PNG at this URL (Meta does not accept SVG/data URIs) -->
+<meta property="og:image" content="https://www.leoforia.gr/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Οθόνη της εφαρμογής Leoforia με αφίξεις λεωφορείων στη στάση Σύνταγμα">
+<meta property="og:locale" content="el_GR">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Leoforia – Πού είναι το λεωφορείο;">
+<meta name="twitter:description" content="Ξέρεις πότε έρχεται. Δωρεάν, για Αθήνα και Θεσσαλονίκη.">
+<meta name="twitter:image" content="https://www.leoforia.gr/og-image.png">
+<meta name="twitter:image:alt" content="Οθόνη της εφαρμογής Leoforia">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23153CE0'/%3E%3Crect x='11' y='15' width='42' height='30' rx='10' fill='%23fff'/%3E%3Crect x='19' y='20' width='26' height='4.5' rx='2.25' fill='%23F19A1E'/%3E%3Crect x='18' y='28' width='12' height='9' rx='2' fill='%23153CE0'/%3E%3Crect x='34' y='28' width='12' height='9' rx='2' fill='%23153CE0'/%3E%3Ccircle cx='22' cy='48' r='4.5' fill='%230E1B3D'/%3E%3Ccircle cx='42' cy='48' r='4.5' fill='%230E1B3D'/%3E%3C/svg%3E">
+<!-- TODO-ASSET when PNG icons exist:
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest"> -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Commissioner:wght@600..800&family=Fira+Sans:wght@400;600&display=swap">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"MobileApplication","name":"Leoforia","url":"https://www.leoforia.gr/","description":"Λεωφορεία σε πραγματικό χρόνο για Αθήνα και Θεσσαλονίκη: θέση οχημάτων, λεπτά άφιξης, στάσεις κοντά σου, αγαπημένα, ειδοποιήσεις.","applicationCategory":"TravelApplication","operatingSystem":"iOS, Android","inLanguage":["el","en"],"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"installUrl":["https://apps.apple.com/gr/app/leoforia/id0000000000","https://play.google.com/store/apps/details?id=gr.leoforia.app"],"screenshot":"https://www.leoforia.gr/og-image.png","author":{"@type":"Organization","name":"Leoforia","url":"https://www.leoforia.gr/"}}
+</script>
+<!-- TODO-RATING: add "aggregateRating" to the JSON-LD only with real store ratings; never fabricate -->
+<noscript><style>.js-only{display:none!important}</style></noscript>
+<style>
+/* ===== Tokens ===== */
+:root{
+  color-scheme:light;
+  --bg:#F4F6FB;--surface:#FFFFFF;--ink:#0E1B3D;--muted:#4A587A;--accent:#153CE0;--accent-deep:#0B2E9C;
+  --accent-2:#F19A1E;--live:#157A45;--board:#121212;--thess:#000080;--border:#D6DDEE;--tile:#E6ECF9;
+  --map:#EEF1F7;--park:#DCEBD9;--wallpaper:#1C2A55;--chalk:#F4F6FB;
+  --font-display:"Commissioner","Fira Sans","Noto Sans","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-body:"Fira Sans","Commissioner","Noto Sans","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--s9:96px;
+  --r-pill:6px;--r-ui:8px;--r-tile:10px;--r-card:16px;--r-board:20px;--r-panel:24px;--r-badge:8px;
+  --shadow-phone:drop-shadow(0 24px 24px rgba(14,27,61,.22)) drop-shadow(0 2px 4px rgba(14,27,61,.12));
+  --shadow-float:0 10px 30px -12px rgba(14,27,61,.35);
+  --fs-h1:clamp(2.375rem,1.4rem + 4.6vw,4.25rem);--fs-h2:clamp(1.75rem,1.25rem + 2vw,2.5rem);
+  --fs-h3:1.3125rem;--fs-h3-sm:1.125rem;--fs-lead:1.0625rem;--fs-body:1.0625rem;--fs-feat:1rem;--fs-step:1.125rem;--fs-faq:1.0625rem;
+  --fs-eyebrow:.875rem;--fs-small:.875rem;--fs-btn:1.125rem;--fs-btn-sm:1rem;
+  --phone-w:300px;
+  --section-pad:56px;
+  --gutter:16px;
+}
+@media (min-width:480px){:root{--gutter:24px}}
+@media (min-width:768px){:root{--section-pad:80px}}
+@media (min-width:1024px){:root{--gutter:32px;--section-pad:96px;--fs-h3:1.375rem;--fs-lead:1.25rem}}
+
+/* ===== Base ===== */
+*,*::before,*::after{box-sizing:border-box}
+html{font-synthesis:none;-webkit-text-size-adjust:100%;overflow-x:clip;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 var(--fs-body)/1.55 var(--font-body)}
+h1,h2,h3,p,ul,ol,figure,figcaption{margin:0}
+ul,ol{padding:0;list-style:none}
+a{color:var(--accent)}
+svg{display:block}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.container{max-width:1120px;margin-inline:auto;padding-inline:var(--gutter)}
+.section{padding-block:var(--section-pad)}
+
+/* ===== Type ===== */
+h1,h2,h3{font-family:var(--font-display);font-weight:800;text-wrap:balance}
+h2{font-size:var(--fs-h2);line-height:1.1;letter-spacing:-.01em}
+h3{font-size:var(--fs-h3);line-height:1.25}
+.lead{font-size:var(--fs-lead);line-height:1.5;max-width:34ch;text-wrap:pretty}
+.eyebrow{display:flex;align-items:center;gap:10px;font:600 var(--fs-eyebrow)/1.3 var(--font-body);letter-spacing:.1em;color:var(--accent)}
+.eyebrow::before{content:"";width:8px;height:8px;background:var(--accent);flex:none}
+.small{font-size:var(--fs-small);line-height:1.45}
+.num{font-variant-numeric:tabular-nums}
+
+/* ===== Skip link ===== */
+.skip{position:absolute;left:16px;top:-120px;z-index:100;padding:14px 16px;border-radius:8px;background:var(--ink);color:#fff;font:600 1rem/1 var(--font-display);text-decoration:none}
+.skip:focus{top:8px}
+
+/* ===== Header ===== */
+.header{position:relative;z-index:10;background:var(--bg)}
+.header .container{display:grid;grid-template-columns:auto 1fr auto;align-items:center;height:52px}
+.brand{display:inline-flex;align-items:center;gap:var(--s2);min-height:44px;color:var(--ink);text-decoration:none;font:600 1.25rem/1 var(--font-display);border-radius:6px}
+.brand svg{width:28px;height:28px}
+.header__right{grid-column:3;display:flex;align-items:center;gap:var(--s3)}
+#cta-header{display:none}
+@media (min-width:768px){
+  .header .container{height:64px}
+  .brand{font-size:1.375rem}
+  .brand svg{width:32px;height:32px}
+  #cta-header{display:inline-flex}
+}
+
+/* ===== Language toggle ===== */
+.lang{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface)}
+.lang__btn{appearance:none;border:0;margin:0;background:transparent;color:var(--ink);min-width:44px;min-height:44px;padding:0 10px;font:600 .9375rem/1 var(--font-display);letter-spacing:.04em;cursor:pointer}
+.lang__btn[aria-pressed="true"]{background:var(--ink);color:#fff}
+.lang__btn:focus-visible{outline-offset:-3px}
+.lang--inverse{border-color:rgba(244,246,251,.4);background:transparent}
+.lang--inverse .lang__btn{color:var(--chalk)}
+.lang--inverse .lang__btn[aria-pressed="true"]{background:var(--chalk);color:var(--ink)}
+.lang--inverse .lang__btn:focus-visible{outline-color:var(--chalk)}
+
+/* ===== Buttons and badges ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);background:var(--accent);color:#fff;text-decoration:none;font-family:var(--font-display);font-weight:600;line-height:1;border-radius:8px;white-space:nowrap;transition:background-color .12s ease}
+.btn:hover{background:var(--accent-deep)}
+.btn:focus-visible{outline-color:var(--ink)}
+.btn--primary{height:52px;padding:0 24px;font-size:var(--fs-btn);border-radius:10px;width:100%}
+.btn--sm{height:44px;padding:0 18px;font-size:var(--fs-btn-sm)}
+@media (min-width:480px){.btn--primary{width:auto}}
+.badges{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3)}
+.badge{display:inline-flex;border-radius:8px;text-decoration:none;font-size:1rem;line-height:0}
+.badge svg{width:150px;height:45px}
+@media (min-width:768px){.badge svg{width:180px;height:54px}}
+
+/* ===== Hero ===== */
+.hero{padding-top:var(--s3);padding-bottom:0}
+.board{container-type:inline-size;background:radial-gradient(circle,rgba(241,154,30,.08) .9px,transparent 1.2px) 0 0/4px 4px,#121212;border:2px solid #2A2A2A;box-shadow:inset 0 1px 0 rgba(255,255,255,.05);border-radius:20px;padding:20px 16px 18px}
+.board__eyebrow{font:600 var(--fs-eyebrow)/1.3 var(--font-body);letter-spacing:.12em;color:var(--accent-2)}
+.led{margin-top:10px;font-size:var(--fs-h1);font-size:min(var(--fs-h1),13.8cqi);line-height:1.02;letter-spacing:.01em;color:var(--accent-2);max-width:8em}
+.led:focus-visible{outline-color:var(--accent-2)}
+.hero .lead{margin-top:var(--s4)}
+.cta-row{margin-top:var(--s4)}
+.hero .badges{margin-top:var(--s3)}
+.stage{position:relative;overflow:hidden}
+.stage--hero{height:446px;margin-top:var(--s5);margin-inline:calc(-1 * var(--gutter))}
+.stage--hero .phone{margin-top:0}
+@media (min-width:768px){
+  .board{border-radius:24px;padding:32px 36px 36px}
+  .stage--hero{height:476px;margin-inline:0}
+  .phone--hero{--phone-w:320px}
+  .led{font-size:var(--fs-h1);font-size:min(var(--fs-h1),13.8cqi)}
+}
+@media (min-width:768px){
+  @supports ((mask-size:4px 4px) or (-webkit-mask-size:4px 4px)){
+    .led{-webkit-mask-image:radial-gradient(circle,#000 42%,transparent 48%);-webkit-mask-size:4px 4px;mask-image:radial-gradient(circle,#000 42%,transparent 48%);mask-size:4px 4px}
+  }
+}
+@media (min-width:1024px){
+  .hero{padding-top:var(--s6)}
+  .hero .container{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:var(--s7);align-items:center}
+  .board{padding:36px 44px 40px}
+  .hero .lead{margin-top:var(--s5)}
+  .cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3);margin-top:var(--s5)}
+  .hero .badges{margin-top:0}
+  .stage--hero{height:626px;margin-top:0}
+  .phone--hero,.phone--live{--phone-w:340px}
+}
+
+/* ===== Trust ===== */
+.trust{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding-block:var(--s4)}
+.chips{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.chip{display:inline-flex;align-items:center;gap:var(--s2);height:40px;padding:0 14px;border:1px solid var(--border);border-radius:8px;font:600 .9375rem/1 var(--font-body);color:var(--ink);white-space:nowrap}
+.chip svg{width:16px;height:16px;color:var(--accent);overflow:visible;flex:none}
+@media (min-width:768px){.chips{gap:var(--s3)}}
+
+/* ===== Phone mockups ===== */
+.phone{width:min(var(--phone-w),100%);aspect-ratio:300/650;margin:0 auto}
+.phone svg{display:block;width:100%;height:auto;filter:var(--shadow-phone)}
+.ph text{font-variant-numeric:tabular-nums}
+.ph .pr{font-family:var(--font-body);font-weight:400;font-size:.6em}
+.ph .pr1{font-family:var(--font-body);font-weight:400}
+.d8{font-family:var(--font-display);font-weight:800}
+.d6{font-family:var(--font-display);font-weight:600}
+.b6{font-family:var(--font-body);font-weight:600}
+.b4{font-family:var(--font-body);font-weight:400}
+.fi{fill:var(--ink)}.fm{fill:var(--muted)}.fw{fill:#fff}.fa{fill:var(--accent)}.fl{fill:var(--live)}.fc{fill:var(--chalk)}.fx{fill:var(--accent-2)}.fs{fill:var(--surface)}.ft{fill:var(--tile)}
+.ci{color:var(--ink)}.cm{color:var(--muted)}.ca{color:var(--accent)}.cw{color:#fff}.cc{color:var(--chalk)}
+.lbl{paint-order:stroke;stroke:#fff;stroke-width:3;stroke-linejoin:round}
+.ls6{letter-spacing:.06em}
+.cyc{transition:opacity .25s ease}
+.cyc.is-arriving{font-size:18px;fill:var(--live)}
+.cyc.is-arriving .pr{display:none}
+
+/* ===== Live ===== */
+.live .container{display:grid;gap:var(--s5)}
+.live__text h2,.live__text .lead{margin-top:var(--s3)}
+.legend{margin-top:var(--s5)}
+.legend li{display:grid;grid-template-columns:auto 1fr;gap:var(--s3);align-items:center;padding:14px 0;font-size:var(--fs-feat);line-height:1.5}
+.legend li+li{border-top:1px solid var(--border)}
+.lchip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:6px;font:600 .875rem/1 var(--font-body);letter-spacing:.04em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.lchip--live{background:var(--live);color:#fff}
+.lchip--sched{background:var(--tile);color:var(--muted)}
+.lchip svg{width:14px;height:14px}
+.lchip .pr{font-weight:400;font-size:.85em}
+.lchip .dot{width:6px;height:6px;border-radius:50%;background:#fff;flex:none}
+@media (min-width:1024px){
+  .live .container{grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--s8);align-items:center}
+  .live__text{max-width:520px}
+  .legend li{grid-template-columns:120px 1fr}
+}
+
+/* ===== Features ===== */
+.features{background:var(--surface);border-bottom:1px solid var(--border)}
+.features h2,.how h2,.coverage h2{margin-top:var(--s3)}
+.features .lead{margin-top:var(--s3)}
+.cards{margin-top:var(--s6);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s5)}
+.card{min-width:0;background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:24px}
+@media (max-width:399.98px){.card{padding:20px}}
+.card .phone{margin-bottom:var(--s5)}
+.card p,.rows p{margin-top:var(--s2);font-size:var(--fs-feat);line-height:1.5}
+.rows{margin-top:var(--s6);display:grid;gap:var(--s5)}
+.rows li{border-top:1px solid var(--border);padding-top:20px}
+.tile{width:44px;height:44px;border-radius:10px;background:var(--tile);display:grid;place-items:center;color:var(--accent)}
+.tile svg{width:24px;height:24px;overflow:visible}
+.rows h3{margin-top:var(--s4);font-size:var(--fs-h3-sm)}
+@media (min-width:768px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.rows{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:1024px){.card{padding:32px}.rows{gap:var(--s6)}}
+
+/* ===== How it works (route diagram) ===== */
+.route{margin-top:var(--s6);position:relative;display:grid;gap:28px}
+.route li{position:relative;padding-left:48px;min-height:28px;display:flex;align-items:center;gap:var(--s3)}
+.route li:not(:last-child)::after{content:"";position:absolute;left:22.5px;top:14px;width:3px;height:calc(100% + 28px);background:var(--accent);border-radius:2px}
+.route__dot{position:absolute;left:16px;top:6px;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--accent);z-index:1}
+.route__bus{position:absolute;left:14px;top:4px;width:20px;height:20px;border-radius:5px;background:var(--accent);color:#fff;display:grid;place-items:center;z-index:1}
+.route__bus svg{width:14px;height:14px}
+.route__icon{width:28px;height:28px;color:var(--accent);flex:none}
+.route__label{font:600 var(--fs-step)/1.3 var(--font-display)}
+.how .note{margin-top:var(--s5);font-size:var(--fs-feat);color:var(--muted)}
+@media (min-width:768px){
+  .route{grid-template-columns:repeat(3,1fr);gap:var(--s6)}
+  .route::before{content:"";position:absolute;left:8px;top:6.5px;height:3px;width:calc(66.6667% + 21.33px);background:var(--accent);border-radius:2px}
+  .route li{padding-left:0;padding-top:36px;flex-direction:column;align-items:flex-start;gap:var(--s3)}
+  .route li:not(:last-child)::after{display:none}
+  .route__dot{left:0;top:0}
+  .route__bus{left:-2px;top:-2px}
+}
+
+/* ===== Coverage ===== */
+.coverage{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.coverage .container{display:grid;gap:var(--s5)}
+.map{order:-1;width:min(100%,260px);height:auto;margin:0 auto}
+.coverage__text p{margin-top:var(--s3);max-width:60ch}
+.coverage .badges{margin-top:20px}
+@media (min-width:1024px){
+  .coverage .container{grid-template-columns:1fr 1fr;gap:var(--s8);align-items:center}
+  .map{order:1;width:100%;max-width:460px;margin:0 0 0 auto}
+}
+
+/* ===== FAQ ===== */
+.faq .narrow{max-width:720px}
+.faq h2{margin-bottom:var(--s5)}
+.faq details{border-top:1px solid var(--border)}
+.faq details:last-of-type{border-bottom:1px solid var(--border)}
+.faq summary{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);min-height:48px;padding:12px 0;font:600 var(--fs-faq)/1.35 var(--font-display);color:var(--ink);cursor:pointer;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary svg{width:20px;height:20px;color:var(--muted);flex:none;transition:transform .15s ease}
+.faq details[open] summary svg{transform:rotate(180deg)}
+.faq .answer{padding:0 0 16px;font-size:var(--fs-feat);line-height:1.5;max-width:60ch}
+
+/* ===== Download ===== */
+.download .panel{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:40px 24px;text-align:center}
+@media (max-width:479.98px){.download .panel{padding:40px 20px}}
+#download{scroll-margin-top:var(--s5)}
+.ribbon{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s2)}
+.pill{display:inline-flex;align-items:center;justify-content:center;height:36px;min-width:44px;padding:0 12px;border-radius:6px;background:var(--accent);color:#fff;font:800 1.125rem/1 var(--font-display);font-variant-numeric:tabular-nums}
+.pill--trolley{background:var(--accent-2);color:var(--ink)}
+.pill--night{background:var(--board);color:var(--accent-2)}
+.pill--thess{background:var(--thess);color:#fff}
+.download h2{margin-top:20px}
+.download .lead{margin-top:var(--s3);margin-inline:auto}
+.download .badges{margin-top:var(--s5);justify-content:center}
+.plate{display:none}
+@media (min-width:768px){
+  .download .panel{padding:56px 48px;display:grid;grid-template-columns:1fr auto;gap:var(--s7);align-items:center;text-align:left}
+  .ribbon{justify-content:flex-start}
+  .download .lead{margin-inline:0}
+  .download .badges{justify-content:flex-start}
+  .plate{display:block;width:200px}
+  .plate svg{width:200px;height:auto}
+  .plate figcaption{margin-top:var(--s3);font-size:var(--fs-small);line-height:1.45;color:var(--muted);text-align:center}
+}
+
+/* ===== Footer ===== */
+.footer{background:var(--ink);color:var(--chalk);border-top:2px solid var(--accent-2);padding:48px 0}
+.footer .row1{display:grid;gap:var(--s5)}
+.footer .lang{justify-self:start}
+.footer .brand{color:var(--chalk)}
+.footer .tagline{margin-top:var(--s2);font-size:.9375rem;opacity:.72}
+.footer nav ul{margin-top:var(--s6);display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5)}
+.footer nav a{display:inline-flex;align-items:center;min-height:44px;padding-block:10px;color:var(--chalk);font-size:.9375rem;text-decoration:none;border-radius:4px}
+.footer nav a:hover,.footer nav a:focus-visible{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px}
+.footer :focus-visible{outline-color:var(--chalk)}
+.footer .legal{margin-top:var(--s5);font-size:var(--fs-small);line-height:1.6;opacity:.72;max-width:70ch;display:grid;gap:var(--s1)}
+@media (min-width:768px){.footer{padding:64px 0}.footer .row1{grid-template-columns:1fr auto;align-items:start}}
+
+/* ===== Sticky bar ===== */
+.sticky{position:fixed;inset:auto 0 0 0;z-index:50;height:calc(64px + env(safe-area-inset-bottom));padding:0 16px env(safe-area-inset-bottom);background:var(--surface);border-top:1px solid var(--border);box-shadow:var(--shadow-float);display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;align-items:center;transform:translateY(100%);opacity:0;visibility:hidden;pointer-events:none;transition:transform .2s ease-out,opacity .2s ease-out,visibility .2s}
+.sticky.is-visible{transform:none;opacity:1;visibility:visible;pointer-events:auto}
+.sticky__icon{width:40px;height:40px}
+.sticky .btn--sm{padding:0 16px}
+.sticky__name{font:600 1rem/1.2 var(--font-display);color:var(--ink)}
+.sticky__sub{font-size:var(--fs-small);line-height:1.3;color:var(--muted)}
+@media (max-width:767.98px){body.has-bar{padding-bottom:calc(64px + env(safe-area-inset-bottom))}}
+@media (min-width:768px){.sticky{display:none}}
+
+/* ===== Motion ===== */
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:.55}}
+@keyframes ring{0%{transform:scale(1);opacity:.9}100%{transform:scale(2.2);opacity:0}}
+.pulse{animation:pulse 2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.ring{animation:ring 2.4s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="a11y.skip">Μετάβαση στο περιεχόμενο</a>
+
+<!-- Icon sprite: 24px grid, stroke 1.75, round caps and joins; pictograms are filled -->
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-bus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h14A1.5 1.5 0 0 1 20.5 6v11a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 17V6A1.5 1.5 0 0 1 5 4.5Z"/><path d="M3.5 12.5h17M7.5 18.5v2M16.5 18.5v2"/><path d="M7.5 15.5h.01M16.5 15.5h.01"/></g></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.5"/></g></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></g></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8Z"/></g></symbol>
+    <symbol id="i-star-f" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8Z" fill="#F19A1E" stroke="#0E1B3D" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5H4.5L6 16.5Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></g></symbol>
+    <symbol id="i-bell-f" viewBox="0 0 24 24"><g fill="#F19A1E" stroke="#0E1B3D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5H4.5L6 16.5Z"/><path d="M10 20.5a2 2 0 0 0 4 0" fill="none"/></g></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20.5 20.5"/></g></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.8 20h18.4L12 4Z"/><path d="M12 10v4.5M12 17.5h.01"/></g></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="2.5" width="13" height="19" rx="2.5"/><path d="M12 7v7M9.5 11.5 12 14l2.5-2.5M10.5 18h3"/></g></symbol>
+    <symbol id="i-locate" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 3.5 3.5 10.5l8 2 2 8 7-17Z"/></g></symbol>
+    <symbol id="i-chev-d" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></g></symbol>
+    <symbol id="i-chev-l" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></g></symbol>
+    <symbol id="i-chev-r" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></g></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12.5V5A1.5 1.5 0 0 1 5 3.5h7.5l8 8-9 9-8-8Z"/><path d="M8 8h.01"/></g></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></g></symbol>
+    <symbol id="i-wheel" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4.5" r="1.5"/><path d="M12 8v5h5.5l2.5 5.5"/><path d="M9 10.5a5.5 5.5 0 1 0 7 7.5"/></g></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></g></symbol>
+    <symbol id="i-flash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.5h8v4l-2 3v10h-4v-10l-2-3Z"/><path d="M12 13v3"/></g></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h3l1.5-2.5h4L15.5 7h3A1.5 1.5 0 0 1 20 8.5V18a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18Z"/><circle cx="12" cy="13" r="3.5"/></g></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></g></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></g></symbol>
+    <!-- filled bus pictogram (windows cut out, shows the square colour behind) -->
+    <symbol id="pic-bus" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M4 2.5h16a3 3 0 0 1 3 3v9.5a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3V5.5a3 3 0 0 1 3-3Zm0 4v5h7.25v-5H4Zm8.75 0v5H20v-5h-7.25Z"/><circle cx="7" cy="20" r="2.2" fill="currentColor"/><circle cx="17" cy="20" r="2.2" fill="currentColor"/></symbol>
+    <!-- app icon variant of the logo mark -->
+    <symbol id="app-icon" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#153CE0"/><rect x="3" y="5" width="26" height="20" rx="7" fill="#FFFFFF"/><rect x="8" y="8.5" width="16" height="3" rx="1.5" fill="#F19A1E"/><rect x="7.5" y="13.5" width="7.5" height="6" rx="1.5" fill="#153CE0"/><rect x="17" y="13.5" width="7.5" height="6" rx="1.5" fill="#153CE0"/><circle cx="9.5" cy="22.5" r="1.6" fill="#153CE0"/><circle cx="22.5" cy="22.5" r="1.6" fill="#153CE0"/><circle cx="10" cy="27" r="2.6" fill="#0E1B3D"/><circle cx="22" cy="27" r="2.6" fill="#0E1B3D"/></symbol>
+  </defs>
+</svg>
+
+<header id="site-header" class="header">
+  <div class="container">
+    <a class="brand" href="/">
+      <svg class="logo-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false">
+        <rect x="3" y="5" width="26" height="20" rx="7" fill="#153CE0"/>
+        <rect x="8" y="8.5" width="16" height="3" rx="1.5" fill="#F19A1E"/>
+        <rect x="7.5" y="13.5" width="7.5" height="6" rx="1.5" fill="#FFFFFF"/>
+        <rect x="17" y="13.5" width="7.5" height="6" rx="1.5" fill="#FFFFFF"/>
+        <circle cx="9.5" cy="22.5" r="1.6" fill="#FFFFFF"/>
+        <circle cx="22.5" cy="22.5" r="1.6" fill="#FFFFFF"/>
+        <circle cx="10" cy="27" r="2.6" fill="#0E1B3D"/>
+        <circle cx="22" cy="27" r="2.6" fill="#0E1B3D"/>
+      </svg>
+      <span>Leoforia</span>
+    </a>
+    <div class="header__right">
+      <div class="lang js-only" role="group" aria-label="Γλώσσα" data-i18n-aria="lang.label">
+        <button type="button" class="lang__btn" data-lang="el" aria-pressed="true" aria-label="Ελληνικά" data-i18n-aria="lang.el.aria">EL</button>
+        <button type="button" class="lang__btn" data-lang="en" aria-pressed="false" aria-label="English" data-i18n-aria="lang.en.aria">EN</button>
+      </div>
+      <a id="cta-header" class="btn btn--sm" href="#download" data-cta data-i18n="header.download">Κατέβασε</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ===================== HERO ===================== -->
+<section id="hero" class="hero" aria-labelledby="h1">
+  <div class="container">
+    <div class="hero__copy">
+      <div class="board">
+        <p class="board__eyebrow" aria-hidden="true" data-i18n="hero.eyebrow">ΖΩΝΤΑΝΑ · ΑΘΗΝΑ · ΘΕΣΣΑΛΟΝΙΚΗ</p>
+        <h1 id="h1" class="led" data-i18n="hero.h1">ΠΟΥ ΕΙΝΑΙ ΤΟ ΛΕΩΦΟΡΕΙΟ;</h1>
+      </div>
+      <p class="lead" data-i18n="hero.lead">Ξέρεις πότε έρχεται. Δωρεάν, για Αθήνα και Θεσσαλονίκη.</p>
+      <div class="cta-row">
+        <a id="cta-hero" class="btn btn--primary" href="#download" data-cta data-i18n="cta.primary">Κατέβασε την εφαρμογή</a>
+        <!-- TEMPORARY recreation. Replace with the official SVG/PNG badges from toolbox.marketingtools.apple.com/app-store/ and play.google.com/intl/en_us/badges/ (language: Ελληνικά) before launch; do not modify the official files. -->
+        <!-- TODO-BADGE: swap the two inline SVG badges below (and in #coverage and #download) for the official assets -->
+        <!-- TODO-STORE: placeholder store URLs and App Store ID; replace when listings exist -->
+        <div class="badges">
+          <a class="badge" href="https://apps.apple.com/gr/app/leoforia/id0000000000" target="_self" rel="noopener" data-store="ios" aria-label="Διαθέσιμο στο App Store" data-i18n-aria="badge.ios.aria">
+            <svg viewBox="0 0 180 54" aria-hidden="true" focusable="false">
+              <rect x=".5" y=".5" width="179" height="53" rx="8" fill="#000" stroke="#A6A6A6" stroke-width="1"/>
+              <g transform="translate(14 15)"><path fill="#FFF" d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></g>
+              <text x="48" y="22" class="b4" font-size="11" fill="#FFF" data-i18n="badge.ios.top">Διαθέσιμο στο</text>
+              <text x="48" y="43" class="b6" font-size="21" fill="#FFF">App Store</text>
+            </svg>
+          </a>
+          <a class="badge" href="https://play.google.com/store/apps/details?id=gr.leoforia.app" target="_self" rel="noopener" data-store="android" aria-label="Διαθέσιμο στο Google Play" data-i18n-aria="badge.play.aria">
+            <svg viewBox="0 0 180 54" aria-hidden="true" focusable="false">
+              <rect x=".5" y=".5" width="179" height="53" rx="8" fill="#000" stroke="#A6A6A6" stroke-width="1"/>
+              <g transform="translate(12 15)" stroke-linejoin="round"><polygon points="3,2 13.5,12 3,22" fill="#00D7FE"/><polygon points="3,2 16.7,9.6 13.5,12" fill="#00F076"/><polygon points="3,22 13.5,12 16.7,14.4" fill="#FF3A44"/><polygon points="13.5,12 16.7,9.6 21,12 16.7,14.4" fill="#FFC900"/></g>
+              <text x="48" y="22" class="b4" font-size="10" letter-spacing=".4" fill="#FFF" data-i18n="badge.play.top">ΔΙΑΘΕΣΙΜΟ ΣΤΟ</text>
+              <text x="48" y="43" class="b6" font-size="19" fill="#FFF">Google Play</text>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage stage--hero">
+      <!-- Mockup 1 — Αφίξεις · ΣΥΝΤΑΓΜΑ -->
+      <figure class="phone phone--hero ph">
+        <svg viewBox="0 0 300 650" role="img" aria-labelledby="m1t" focusable="false">
+          <title id="m1t" data-i18n="m1.title">Οθόνη της εφαρμογής: αφίξεις στη στάση Σύνταγμα — 040 Πειραιάς σε 2 λεπτά, 550 Παλαιό Φάληρο σε 6, Α2 Βούλα έρχεται, Α3 Γλυφάδα σε 14 από πρόγραμμα.</title>
+          <defs>
+            <clipPath id="m1s"><rect x="8" y="8" width="284" height="634" rx="36"/></clipPath>
+            <clipPath id="m1c"><rect x="82" y="148" width="122" height="288"/></clipPath>
+          </defs>
+          <rect width="300" height="650" rx="44" class="fi"/>
+          <g clip-path="url(#m1s)" aria-hidden="true">
+            <rect x="8" y="8" width="284" height="634" fill="var(--bg)"/>
+            <!-- status bar -->
+            <text x="28" y="36" class="d6 fi" font-size="15">08:42</text>
+            <g class="fi"><rect x="218" y="33" width="3" height="5" rx="1"/><rect x="223" y="31" width="3" height="7" rx="1"/><rect x="228" y="29" width="3" height="9" rx="1"/><rect x="233" y="27" width="3" height="11" rx="1"/></g>
+            <g fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round"><path d="M242 31.5a9.8 9.8 0 0 1 14 0"/><path d="M245.3 34.8a5.2 5.2 0 0 1 7.4 0"/></g><circle cx="249" cy="38" r="1.4" class="fi"/>
+            <rect x="262" y="27" width="22" height="11" rx="3" fill="none" stroke="var(--ink)" stroke-width="1.5"/><rect x="264" y="29" width="14.4" height="7" rx="1.5" class="fi"/><rect x="285" y="30" width="2" height="5" rx="1" class="fi"/>
+            <!-- header: back, LIVE chip -->
+            <use href="#i-chev-l" x="16" y="64" width="24" height="24" class="ci"/>
+            <g data-fit data-fit-right="284">
+              <rect x="174" y="60" width="110" height="28" rx="8" class="fl"/>
+              <circle cx="188" cy="74" r="3.5" class="fw pulse"/>
+              <text x="200" y="78.5" class="b6 fw" font-size="13"><tspan data-i18n="m1.chip.pre">ΖΩΝΤΑΝΑ </tspan><tspan data-tick>8</tspan>″</text>
+            </g>
+            <!-- stop header -->
+            <rect x="16" y="100" width="28" height="28" rx="5" class="fa"/>
+            <use href="#pic-bus" x="21" y="105" width="18" height="18" class="cw"/>
+            <text x="54" y="118" class="d8 fi" font-size="24">ΣΥΝΤΑΓΜΑ</text>
+            <use href="#i-star-f" x="198" y="102" width="16" height="16"/>
+            <text x="54" y="136" class="b4 fm" font-size="13" data-i18n="m1.street">Επί της ΑΜΑΛΙΑΣ · 120 μ.</text>
+            <!-- arrivals list -->
+            <rect x="16" y="148" width="268" height="288" rx="16" class="fs" stroke="var(--border)"/>
+            <path d="M32 220H268M32 292H268M32 364H268" stroke="var(--tile)" stroke-width="1"/>
+            <!-- row 1: 040 ΠΕΙΡΑΙΑΣ -->
+            <rect x="28" y="169" width="44" height="30" rx="7" class="fa"/><text x="50" y="190" class="d8 fw" font-size="16" text-anchor="middle">040</text>
+            <g clip-path="url(#m1c)"><text x="82" y="181" class="b6 fi" font-size="15">ΠΕΙΡΑΙΑΣ</text><text x="82" y="200" class="b4 fm" font-size="13" data-i18n="m1.r1.sub">24ωρη · επόμενο 17′</text></g>
+            <use href="#i-bell-f" x="162" y="168" width="14" height="14"/>
+            <text x="268" y="188" text-anchor="end" class="d8 fi cyc" font-size="30" data-cycle><tspan class="num">2</tspan><tspan class="pr">′</tspan></text>
+            <circle cx="212" cy="202" r="3.5" class="fl"/><text x="220" y="206" class="b4 fm" font-size="13" data-i18n="m.live">ζωντανά</text>
+            <!-- row 2: 550 Π. ΦΑΛΗΡΟ -->
+            <rect x="28" y="241" width="44" height="30" rx="7" class="fa"/><text x="50" y="262" class="d8 fw" font-size="16" text-anchor="middle">550</text>
+            <g clip-path="url(#m1c)"><text x="82" y="253" class="b6 fi" font-size="15">Π. ΦΑΛΗΡΟ</text><text x="82" y="272" class="b4 fm" font-size="13" data-i18n="m1.r2.sub">επόμενο 14′</text></g>
+            <text x="268" y="260" text-anchor="end" class="d8 fi" font-size="30"><tspan class="num">6</tspan><tspan class="pr">′</tspan></text>
+            <circle cx="212" cy="274" r="3.5" class="fl"/><text x="220" y="278" class="b4 fm" font-size="13" data-i18n="m.live">ζωντανά</text>
+            <!-- row 3: Α2 ΒΟΥΛΑ -->
+            <rect x="28" y="313" width="44" height="30" rx="7" class="fa"/><text x="50" y="334" class="d8 fw" font-size="16" text-anchor="middle">Α2</text>
+            <g clip-path="url(#m1c)"><text x="82" y="325" class="b6 fi" font-size="15">ΒΟΥΛΑ</text><text x="82" y="344" class="b4 fm" font-size="13" data-i18n="m1.r3.sub">μέσω Λ. Αμφιθέας</text></g>
+            <text x="268" y="330" text-anchor="end" class="d8 fl" font-size="18" data-i18n="m.arriving">Έρχεται</text>
+            <circle cx="212" cy="346" r="3.5" class="fl"/><text x="220" y="350" class="b4 fm" font-size="13" data-i18n="m.live">ζωντανά</text>
+            <!-- row 4: Α3 ΓΛΥΦΑΔΑ (scheduled) -->
+            <rect x="28" y="385" width="44" height="30" rx="7" class="fa"/><text x="50" y="406" class="d8 fw" font-size="16" text-anchor="middle">Α3</text>
+            <g clip-path="url(#m1c)"><text x="82" y="397" class="b6 fi" font-size="15">ΓΛΥΦΑΔΑ</text><text x="82" y="416" class="b4 fm" font-size="13" data-i18n="m1.r4.sub">Λ. Βουλιαγμένης</text></g>
+            <text x="268" y="404" text-anchor="end" class="d8 fm" font-size="30"><tspan class="num">14</tspan><tspan class="pr">′</tspan></text>
+            <use href="#i-clock" x="186" y="412" width="11" height="11" class="cm"/><text x="201" y="422" class="b4 fm" font-size="13" data-i18n="m.sched">πρόγραμμα</text>
+            <!-- alert card -->
+            <rect x="16" y="452" width="268" height="88" rx="16" class="fs" stroke="var(--border)"/>
+            <use href="#i-bell" x="32" y="466" width="16" height="16" class="ca"/>
+            <text x="56" y="478" class="b6 fi" font-size="14" data-i18n="m1.alert.h">Ειδοποίηση για το 040</text>
+            <text x="32" y="500" class="b4 fm" font-size="13" data-i18n="m1.alert.q">Πόσο πριν;</text>
+            <rect x="32" y="508" width="60" height="26" rx="8" class="fa"/><text x="62" y="525.5" text-anchor="middle" class="d6 fw" font-size="13">3<tspan class="pr1">′</tspan></text>
+            <rect x="100" y="508" width="60" height="26" rx="8" fill="none" stroke="var(--accent)" stroke-width="1.5"/><text x="130" y="525.5" text-anchor="middle" class="d6 fa" font-size="13">5<tspan class="pr1">′</tspan></text>
+            <rect x="168" y="508" width="60" height="26" rx="8" fill="none" stroke="var(--accent)" stroke-width="1.5"/><text x="198" y="525.5" text-anchor="middle" class="d6 fa" font-size="13">10<tspan class="pr1">′</tspan></text>
+            <!-- tab bar -->
+            <rect x="8" y="566" width="284" height="76" class="fs"/><path d="M8 566.5H292" stroke="var(--border)" stroke-width="1"/>
+            <use href="#i-pin" x="32.5" y="580" width="22" height="22" class="cm"/><text x="43.5" y="620" text-anchor="middle" class="b6 fm" font-size="13" data-i18n="tab.nearby">Κοντά μου</text>
+            <use href="#i-clock" x="103.5" y="580" width="22" height="22" class="ca"/><text x="114.5" y="620" text-anchor="middle" class="b6 fa" font-size="13" data-i18n="tab.arrivals">Αφίξεις</text>
+            <use href="#i-star" x="174.5" y="580" width="22" height="22" class="cm"/><text x="185.5" y="620" text-anchor="middle" class="b6 fm" font-size="13" data-i18n="tab.fav">Αγαπημένα</text>
+            <use href="#i-bus" x="245.5" y="580" width="22" height="22" class="cm"/><text x="256.5" y="620" text-anchor="middle" class="b6 fm" font-size="13" data-i18n="tab.lines">Γραμμές</text>
+            <rect x="95" y="628" width="110" height="4" rx="2" class="fi" opacity=".4"/>
+          </g>
+          <rect x="105" y="14" width="90" height="26" rx="13" class="fi"/>
+        </svg>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TRUST ===================== -->
+<section id="trust" class="trust" aria-labelledby="trust-h2">
+  <div class="container">
+    <h2 id="trust-h2" class="sr-only" data-i18n="trust.h2">Με μια ματιά</h2>
+    <ul class="chips">
+      <li class="chip"><svg aria-hidden="true" focusable="false"><use href="#i-tag"/></svg><span data-i18n="trust.free">Δωρεάν</span></li>
+      <li class="chip"><svg aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span data-i18n="trust.nosignup">Χωρίς εγγραφή</span></li>
+      <li class="chip"><svg aria-hidden="true" focusable="false"><use href="#i-pin"/></svg><span data-i18n="trust.cities">Αθήνα · Θεσσαλονίκη</span></li>
+      <li class="chip"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle class="pulse" cx="8" cy="8" r="5" fill="#157A45" stroke="#0E1B3D" stroke-width="1"/></svg><span data-i18n="trust.live">Ζωντανά δεδομένα</span></li>
+      <li class="chip"><svg aria-hidden="true" focusable="false"><use href="#i-bus"/></svg><span data-i18n="trust.indie">Ανεξάρτητη εφαρμογή</span></li>
+      <!-- TODO-RATING: enable only with a real store rating: <li class="chip"><svg star/> 4,7 · App Store</li> -->
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== LIVE MAP ===================== -->
+<section id="live" class="section live" aria-labelledby="live-h2">
+  <div class="container">
+    <!-- Mockup 2 — Χάρτης · γραμμή 550 ζωντανά -->
+    <figure class="phone phone--live ph">
+      <svg viewBox="0 0 300 650" role="img" aria-labelledby="m2t" focusable="false">
+        <title id="m2t" data-i18n="m2.title">Οθόνη χάρτη: δύο λεωφορεία της γραμμής 550 στη Λεωφόρο Αμαλίας και Βασιλίσσης Σοφίας, επόμενη στάση Σύνταγμα, στη στάση Χίλτον σε 3 λεπτά.</title>
+        <defs>
+          <clipPath id="m2s"><rect x="8" y="8" width="284" height="634" rx="36"/></clipPath>
+          <clipPath id="m2m"><rect x="8" y="156" width="284" height="274"/></clipPath>
+          <filter id="m2sh" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0E1B3D" flood-opacity=".18"/></filter>
+          <filter id="m2sheet" x="-10%" y="-20%" width="120%" height="140%"><feDropShadow dx="0" dy="-3" stdDeviation="6" flood-color="#0E1B3D" flood-opacity=".14"/></filter>
+        </defs>
+        <rect width="300" height="650" rx="44" class="fi"/>
+        <g clip-path="url(#m2s)" aria-hidden="true">
+          <rect x="8" y="8" width="284" height="634" fill="var(--bg)"/>
+          <!-- status bar -->
+          <text x="28" y="36" class="d6 fi" font-size="15">08:42</text>
+          <g class="fi"><rect x="218" y="33" width="3" height="5" rx="1"/><rect x="223" y="31" width="3" height="7" rx="1"/><rect x="228" y="29" width="3" height="9" rx="1"/><rect x="233" y="27" width="3" height="11" rx="1"/></g>
+          <g fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round"><path d="M242 31.5a9.8 9.8 0 0 1 14 0"/><path d="M245.3 34.8a5.2 5.2 0 0 1 7.4 0"/></g><circle cx="249" cy="38" r="1.4" class="fi"/>
+          <rect x="262" y="27" width="22" height="11" rx="3" fill="none" stroke="var(--ink)" stroke-width="1.5"/><rect x="264" y="29" width="14.4" height="7" rx="1.5" class="fi"/><rect x="285" y="30" width="2" height="5" rx="1" class="fi"/>
+          <!-- search field -->
+          <rect x="16" y="60" width="268" height="44" rx="12" class="fs" stroke="var(--border)"/>
+          <rect x="26" y="69" width="40" height="26" rx="6" class="fa"/><text x="46" y="88" text-anchor="middle" class="d8 fw" font-size="14">550</text>
+          <text x="74" y="87" class="b6 fi" font-size="14">Π. ΦΑΛΗΡΟ – ΚΗΦΙΣΙΑ</text>
+          <use href="#i-x" x="258" y="74" width="16" height="16" class="cm"/>
+          <!-- direction segment -->
+          <rect x="16" y="112" width="268" height="36" rx="10" class="ft"/>
+          <rect x="18" y="114" width="132" height="32" rx="8" class="fi"/>
+          <text x="84" y="139" text-anchor="middle" class="b6 fw" font-size="13" data-i18n="m2.dir1">Προς ΚΗΦΙΣΙΑ</text>
+          <text x="217" y="139" text-anchor="middle" class="b6 fi" font-size="13" data-i18n="m2.dir2">Προς Π. ΦΑΛΗΡΟ</text>
+          <!-- map -->
+          <g clip-path="url(#m2m)">
+            <rect x="8" y="156" width="284" height="274" fill="var(--map)"/>
+            <g fill="#E8ECF5">
+              <path d="M26 156H150V284Z"/>
+              <path d="M8 156H26L150 284L136 302L8 322Z"/>
+              <path d="M8 322L136 302L112 430H8Z"/>
+              <path d="M138 300L176 302L190 430H112Z"/>
+              <path d="M150 156H292V200L160 286L150 284Z"/>
+              <path d="M176 302L292 200V330L212 322L205 430H190Z"/>
+            </g>
+            <path d="M212 322L292 330V430H205Z" fill="var(--park)"/>
+            <rect x="140" y="262" width="40" height="36" rx="3" fill="#E4E9F3"/>
+            <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M140 262L180 298M180 262L140 298" stroke-width="1.5"/>
+              <path d="M136 302L34 198M70 322L90 400M60 232L92 196M210 180L240 208" stroke-width="3"/>
+              <path d="M202 230L228 270M247 201L273 241" stroke-width="3"/>
+              <path d="M176 302L190 430M136 302L8 322M138 300L212 306" stroke-width="4"/>
+              <path d="M150 284L26 156" stroke-width="6"/>
+              <path d="M112 430L138 300M160 286L292 200" stroke-width="7"/>
+            </g>
+            <text x="222" y="350" class="b4" font-size="11" fill="#6E7B52">ΕΘΝΙΚΟΣ</text>
+            <text x="222" y="364" class="b4" font-size="11" fill="#6E7B52">ΚΗΠΟΣ</text>
+            <g class="b4 fm" font-size="11">
+              <text transform="translate(101 424) rotate(-79)">ΑΜΑΛΙΑΣ</text>
+              <text transform="translate(226 268) rotate(-33)">Λ. ΒΑΣ. ΣΟΦΙΑΣ</text>
+              <text transform="translate(46 196) rotate(46)">ΠΑΝΕΠΙΣΤΗΜΙΟΥ</text>
+              <text transform="translate(200 348) rotate(84)">ΦΙΛΕΛΛΗΝΩΝ</text>
+            </g>
+            <!-- route 550 -->
+            <path d="M112 430L138 300Q146 284 162 286L292 200" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- other lines, dimmed -->
+            <g opacity=".55">
+              <g transform="translate(166 303)"><rect x="-15" y="-10" width="30" height="20" rx="4" class="fa"/><text y="4" text-anchor="middle" class="d8 fw" font-size="11">040</text></g>
+              <g transform="translate(206 306)"><rect x="-15" y="-10" width="30" height="20" rx="4" class="fa"/><text y="4" text-anchor="middle" class="d8 fw" font-size="11">Χ95</text></g>
+              <g transform="translate(182 352)"><rect x="-15" y="-10" width="30" height="20" rx="4" class="fx"/><text y="4" text-anchor="middle" class="d8 fi" font-size="11">11</text></g>
+            </g>
+            <!-- stops -->
+            <g fill="#fff" stroke="var(--accent)" stroke-width="2.5"><circle cx="122" cy="380" r="5"/><circle cx="142" cy="300" r="5"/><circle cx="240" cy="234" r="5"/><circle cx="289" cy="202" r="5"/></g>
+            <g class="b6 fi lbl" font-size="13">
+              <text x="132" y="384">ΖΑΠΠΕΙΟ</text>
+              <text x="60" y="288">ΣΥΝΤΑΓΜΑ</text>
+              <text x="228" y="220" text-anchor="end">ΕΥΑΓΓΕΛΙΣΜΟΣ</text>
+              <text x="281" y="196" text-anchor="end">ΧΙΛΤΟΝ</text>
+            </g>
+            <!-- user location on Ermou -->
+            <circle cx="76" cy="312" r="18" fill="rgba(21,60,224,.15)"/>
+            <circle cx="76" cy="312" r="6" class="fa" stroke="#fff" stroke-width="3"/>
+            <!-- line 550 vehicles -->
+            <g transform="translate(126 352)">
+              <circle r="18" fill="none" stroke="var(--accent)" stroke-width="2" class="ring"/>
+              <rect x="-18" y="-12" width="36" height="24" rx="5" class="fa"/>
+              <path d="M-3.5 0L0 -5L3.5 0Z" fill="#fff" transform="translate(2.3 -12) rotate(11)"/>
+              <text y="4.5" text-anchor="middle" class="d8 fw" font-size="12">550</text>
+            </g>
+            <g transform="translate(204 257)">
+              <rect x="-18" y="-12" width="36" height="24" rx="5" class="fa"/>
+              <path d="M-3.5 0L0 -5L3.5 0Z" fill="#fff" transform="translate(16.5 -10.5) rotate(57)"/>
+              <text y="4.5" text-anchor="middle" class="d8 fw" font-size="12">550</text>
+            </g>
+            <!-- locate button -->
+            <circle cx="262" cy="404" r="22" fill="#fff" filter="url(#m2sh)"/>
+            <use href="#i-locate" x="253" y="395" width="18" height="18" class="ca"/>
+          </g>
+          <!-- bottom sheet -->
+          <path d="M8 450a20 20 0 0 1 20-20h244a20 20 0 0 1 20 20v192H8Z" fill="#fff" filter="url(#m2sheet)"/>
+          <path d="M8 450a20 20 0 0 1 20-20h244a20 20 0 0 1 20 20" fill="none" stroke="var(--border)" stroke-width="1"/>
+          <rect x="132" y="438" width="36" height="4" rx="2" fill="var(--border)"/>
+          <rect x="24" y="456" width="44" height="28" rx="7" class="fa"/><text x="46" y="476" text-anchor="middle" class="d8 fw" font-size="15">550</text>
+          <text x="78" y="476" class="b6 fi" font-size="16" data-i18n="m2.dir1">Προς ΚΗΦΙΣΙΑ</text>
+          <g data-fit data-fit-right="284">
+            <rect x="204" y="457" width="80" height="26" rx="7" class="fl"/>
+            <circle cx="218" cy="470" r="3.5" class="fw pulse"/>
+            <text x="228" y="474.5" class="b6 fw" font-size="13"><tspan data-i18n="m2.chip.pre">πριν </tspan><tspan data-tick>8</tspan>″<tspan data-i18n="m2.chip.post"></tspan></text>
+          </g>
+          <text x="24" y="508" class="b4 fm" font-size="13" data-i18n="m2.next">Επόμενη στάση</text>
+          <text x="24" y="532" class="d8 fi" font-size="17">ΣΥΝΤΑΓΜΑ</text>
+          <text x="156" y="508" class="b4 fm" font-size="13" data-i18n="m2.your">Στάση ΧΙΛΤΟΝ</text>
+          <text x="156" y="538" class="d8 fi" font-size="32">3<tspan class="pr">′</tspan></text>
+          <text x="192" y="538" class="b4 fm" font-size="13" data-i18n="m2.min">λεπτά</text>
+          <text x="24" y="558" class="b4 fm" font-size="13" data-i18n="m2.after">Επόμενα: 11′ · 19′</text>
+          <rect x="24" y="570" width="252" height="44" rx="10" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+          <use href="#i-bell" x="62" y="583" width="18" height="18" class="ca"/>
+          <text x="90" y="597" class="d6 fa" font-size="15" data-i18n="m2.btn">Ειδοποίησέ με 3′ πριν</text>
+          <rect x="95" y="628" width="110" height="4" rx="2" class="fi" opacity=".4"/>
+        </g>
+        <rect x="105" y="14" width="90" height="26" rx="13" class="fi"/>
+      </svg>
+    </figure>
+
+    <div class="live__text">
+      <p class="eyebrow" data-i18n="live.eyebrow">ΖΩΝΤΑΝΑ</p>
+      <h2 id="live-h2" data-i18n="live.h2">Το βλέπεις να έρχεται.</h2>
+      <p class="lead" data-i18n="live.lead">Το λεωφορείο κινείται στον χάρτη, όπως στον δρόμο. Και ξέρεις πάντα πότε ενημερώθηκε.</p>
+      <ul class="legend">
+        <li><span class="lchip lchip--live"><span class="dot pulse"></span><span data-i18n="live.l1.chip">ΖΩΝΤΑΝΑ</span></span><span data-i18n="live.l1.text">Σήμα από το λεωφορείο αυτή τη στιγμή.</span></li>
+        <li><span class="lchip lchip--sched"><svg aria-hidden="true" focusable="false"><use href="#i-clock"/></svg><span data-i18n="live.l2.chip">ΠΡΟΓΡΑΜΜΑ</span></span><span data-i18n="live.l2.text">Χωρίς σήμα, βλέπεις την ώρα του δρομολογίου.</span></li>
+        <li><span class="lchip lchip--live"><span><span data-i18n="live.l3.pre">πριν </span><span class="num" data-tick>8</span><span class="pr">″</span><span data-i18n="live.l3.post"></span></span></span><span data-i18n="live.l3.text">Πάντα ξέρεις πότε ενημερώθηκε.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FEATURES ===================== -->
+<section id="features" class="section features" aria-labelledby="features-h2">
+  <div class="container">
+    <p class="eyebrow" data-i18n="features.eyebrow">ΛΕΙΤΟΥΡΓΙΕΣ</p>
+    <h2 id="features-h2" data-i18n="features.h2">Ό,τι χρειάζεσαι στη στάση.</h2>
+    <p class="lead" data-i18n="features.lead">Απλά πράγματα που δουλεύουν κάθε μέρα.</p>
+
+    <div class="cards">
+      <article class="card">
+        <!-- Mockup 3 — Κοντά μου -->
+        <figure class="phone ph">
+          <svg viewBox="0 0 300 650" role="img" aria-labelledby="m3t" focusable="false">
+            <title id="m3t" data-i18n="m3.title">Οθόνη «Κοντά μου»: τρεις στάσεις γύρω από το Σύνταγμα με τις επόμενες αφίξεις — Σύνταγμα 120 μέτρα, Πλατεία Συντάγματος 210, Ζάππειο 380.</title>
+            <defs>
+              <clipPath id="m3s"><rect x="8" y="8" width="284" height="634" rx="36"/></clipPath>
+              <clipPath id="m3m"><rect x="16" y="160" width="268" height="120" rx="16"/></clipPath>
+              <clipPath id="m3c"><rect x="70" y="312" width="176" height="252"/></clipPath>
+            </defs>
+            <rect width="300" height="650" rx="44" class="fi"/>
+            <g clip-path="url(#m3s)" aria-hidden="true">
+              <rect x="8" y="8" width="284" height="634" fill="var(--bg)"/>
+              <!-- status bar -->
+              <text x="28" y="36" class="d6 fi" font-size="15">08:42</text>
+              <g class="fi"><rect x="218" y="33" width="3" height="5" rx="1"/><rect x="223" y="31" width="3" height="7" rx="1"/><rect x="228" y="29" width="3" height="9" rx="1"/><rect x="233" y="27" width="3" height="11" rx="1"/></g>
+              <g fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round"><path d="M242 31.5a9.8 9.8 0 0 1 14 0"/><path d="M245.3 34.8a5.2 5.2 0 0 1 7.4 0"/></g><circle cx="249" cy="38" r="1.4" class="fi"/>
+              <rect x="262" y="27" width="22" height="11" rx="3" fill="none" stroke="var(--ink)" stroke-width="1.5"/><rect x="264" y="29" width="14.4" height="7" rx="1.5" class="fi"/><rect x="285" y="30" width="2" height="5" rx="1" class="fi"/>
+              <!-- title + locate -->
+              <text x="16" y="86" class="d8 fi" font-size="24" data-i18n="m3.h">Κοντά μου</text>
+              <circle cx="268" cy="78" r="20" class="fs" stroke="var(--border)"/><use href="#i-locate" x="259" y="69" width="18" height="18" class="ca"/>
+              <!-- search -->
+              <rect x="16" y="104" width="268" height="44" rx="12" class="fs" stroke="var(--border)"/>
+              <use href="#i-search" x="28" y="117" width="18" height="18" class="cm"/>
+              <text x="54" y="131" class="b4 fm" font-size="13" data-i18n="m3.search">Γραμμή ή στάση: 040, Χ95, Χίλτον</text>
+              <!-- mini map -->
+              <g clip-path="url(#m3m)">
+                <rect x="16" y="160" width="268" height="120" fill="var(--map)"/>
+                <g fill="#E8ECF5"><rect x="16" y="160" width="268" height="40"/><rect x="16" y="245" width="268" height="35"/><rect x="95" y="200" width="95" height="45"/></g>
+                <g fill="none" stroke="#fff" stroke-linecap="round"><path d="M16 200H284M16 245H284" stroke-width="5"/><path d="M95 160V280M190 160V280" stroke-width="4"/><path d="M16 275L120 160" stroke-width="3"/></g>
+                <circle cx="150" cy="220" r="52" fill="none" stroke="var(--accent)" stroke-width="1" stroke-dasharray="3 3"/>
+                <text x="205" y="194" class="b6 fa" font-size="11" data-i18n="m3.radius">200 μ.</text>
+                <rect x="102" y="188" width="16" height="16" rx="3" class="fa"/><use href="#pic-bus" x="105" y="191" width="10" height="10" class="cw"/>
+                <rect x="222" y="200" width="16" height="16" rx="3" class="fa"/><use href="#pic-bus" x="225" y="203" width="10" height="10" class="cw"/>
+                <rect x="164" y="244" width="16" height="16" rx="3" class="fa"/><use href="#pic-bus" x="167" y="247" width="10" height="10" class="cw"/>
+                <rect x="112" y="242" width="16" height="16" rx="3" class="fx"/><use href="#pic-bus" x="115" y="245" width="10" height="10" class="ci"/>
+                <circle cx="150" cy="220" r="16" fill="rgba(21,60,224,.15)"/>
+                <circle cx="150" cy="220" r="6" class="fa" stroke="#fff" stroke-width="3"/>
+              </g>
+              <!-- list -->
+              <text x="16" y="302" class="b6 fm ls6" font-size="13" data-i18n="m3.listh">ΣΤΑΣΕΙΣ ΚΟΝΤΑ ΣΟΥ</text>
+              <rect x="16" y="312" width="268" height="252" rx="16" class="fs" stroke="var(--border)"/>
+              <path d="M32 396H268M32 480H268" stroke="var(--tile)" stroke-width="1"/>
+              <!-- row 1: ΣΥΝΤΑΓΜΑ -->
+              <rect x="28" y="326" width="30" height="30" rx="6" class="fa"/><use href="#pic-bus" x="33" y="331" width="20" height="20" class="cw"/>
+              <g clip-path="url(#m3c)"><text x="70" y="342" class="d8 fi" font-size="16">ΣΥΝΤΑΓΜΑ</text><use href="#i-wheel" x="168" y="330" width="13" height="13" class="cm"/><text x="70" y="360" class="b4 fm" font-size="13" data-i18n="m3.r1.sub">Επί της ΑΜΑΛΙΑΣ · 120 μ.</text></g>
+              <rect x="70" y="368" width="34" height="22" rx="5" class="fa"/><text x="87" y="384" text-anchor="middle" class="d8 fw" font-size="12">040</text><text x="110" y="384" class="b6 fi" font-size="14">2′</text>
+              <rect x="132" y="368" width="34" height="22" rx="5" class="fa"/><text x="149" y="384" text-anchor="middle" class="d8 fw" font-size="12">550</text><text x="172" y="384" class="b6 fi" font-size="14">6′</text>
+              <rect x="194" y="368" width="34" height="22" rx="5" class="fa"/><text x="211" y="384" text-anchor="middle" class="d8 fw" font-size="12">Α2</text><text x="234" y="384" class="b6 fl" font-size="14" data-i18n="m3.arr">Έρχ.</text>
+              <use href="#i-chev-r" x="258" y="346" width="16" height="16" class="cm"/>
+              <!-- row 2: ΠΛ.ΣΥΝΤΑΓΜΑΤΟΣ (trolley) -->
+              <rect x="28" y="410" width="30" height="30" rx="6" class="fx"/><use href="#pic-bus" x="33" y="415" width="20" height="20" class="ci"/>
+              <g clip-path="url(#m3c)"><text x="70" y="426" class="d8 fi" font-size="16">ΠΛ.ΣΥΝΤΑΓΜΑΤΟΣ</text><text x="70" y="444" class="b4 fm" font-size="13" data-i18n="m3.r2.sub">Επί της ΦΙΛΕΛΛΗΝΩΝ · 210 μ.</text></g>
+              <rect x="70" y="452" width="34" height="22" rx="5" class="fx"/><text x="87" y="468" text-anchor="middle" class="d8 fi" font-size="12">11</text><text x="110" y="468" class="b6 fi" font-size="14">3′</text>
+              <rect x="132" y="452" width="34" height="22" rx="5" class="fx"/><text x="149" y="468" text-anchor="middle" class="d8 fi" font-size="12">5</text><text x="172" y="468" class="b6 fi" font-size="14">4′</text>
+              <rect x="194" y="452" width="34" height="22" rx="5" class="fx"/><text x="211" y="468" text-anchor="middle" class="d8 fi" font-size="12">15</text><text x="234" y="468" class="b6 fi" font-size="14">11′</text>
+              <use href="#i-chev-r" x="258" y="430" width="16" height="16" class="cm"/>
+              <!-- row 3: ΖΑΠΠΕΙΟ -->
+              <rect x="28" y="494" width="30" height="30" rx="6" class="fa"/><use href="#pic-bus" x="33" y="499" width="20" height="20" class="cw"/>
+              <g clip-path="url(#m3c)"><text x="70" y="510" class="d8 fi" font-size="16">ΖΑΠΠΕΙΟ</text><text x="70" y="528" class="b4 fm" font-size="13" data-i18n="m3.r3.sub">Επί της ΑΜΑΛΙΑΣ · 380 μ.</text></g>
+              <rect x="70" y="536" width="34" height="22" rx="5" class="fa"/><text x="87" y="552" text-anchor="middle" class="d8 fw" font-size="12">Α2</text><text x="110" y="552" class="b6 fi" font-size="14">7′</text>
+              <rect x="132" y="536" width="34" height="22" rx="5" class="fa"/><text x="149" y="552" text-anchor="middle" class="d8 fw" font-size="12">Α3</text><text x="172" y="552" class="b6 fi" font-size="14">12′</text>
+              <rect x="200" y="536" width="34" height="22" rx="5" class="fa"/><text x="217" y="552" text-anchor="middle" class="d8 fw" font-size="12">550</text><text x="240" y="552" class="b6 fi" font-size="14">15′</text>
+              <use href="#i-chev-r" x="258" y="514" width="16" height="16" class="cm"/>
+              <!-- tab bar -->
+              <rect x="8" y="566" width="284" height="76" class="fs"/><path d="M8 566.5H292" stroke="var(--border)" stroke-width="1"/>
+              <use href="#i-pin" x="32.5" y="580" width="22" height="22" class="ca"/><text x="43.5" y="620" text-anchor="middle" class="b6 fa" font-size="13" data-i18n="tab.nearby">Κοντά μου</text>
+              <use href="#i-clock" x="103.5" y="580" width="22" height="22" class="cm"/><text x="114.5" y="620" text-anchor="middle" class="b6 fm" font-size="13" data-i18n="tab.arrivals">Αφίξεις</text>
+              <use href="#i-star" x="174.5" y="580" width="22" height="22" class="cm"/><text x="185.5" y="620" text-anchor="middle" class="b6 fm" font-size="13" data-i18n="tab.fav">Αγαπημένα</text>
+              <use href="#i-bus" x="245.5" y="580" width="22" height="22" class="cm"/><text x="256.5" y="620" text-anchor="middle" class="b6 fm" font-size="13" data-i18n="tab.lines">Γραμμές</text>
+              <rect x="95" y="628" width="110" height="4" rx="2" class="fi" opacity=".4"/>
+            </g>
+            <rect x="105" y="14" width="90" height="26" rx="13" class="fi"/>
+          </svg>
+        </figure>
+        <h3 data-i18n="feat.nearby.h3">Στάσεις κοντά σου</h3>
+        <p data-i18n="feat.nearby.text">Άνοιξε την εφαρμογή και δες τις στάσεις γύρω σου αμέσως.</p>
+      </article>
+
+      <article class="card">
+        <!-- Mockup 4 — Lock screen with two notifications -->
+        <!-- TODO-CLAIM: disruption notifications -->
+        <figure class="phone ph">
+          <svg viewBox="0 0 300 650" role="img" aria-labelledby="m4t" focusable="false">
+            <title id="m4t" data-i18n="m4.title">Κλειδωμένη οθόνη με δύο ειδοποιήσεις της Leoforia: το 040 φτάνει σε 3 λεπτά στη στάση Σύνταγμα, και εκτροπή της γραμμής 550 την Κυριακή λόγω Μαραθωνίου.</title>
+            <defs>
+              <clipPath id="m4s"><rect x="8" y="8" width="284" height="634" rx="36"/></clipPath>
+              <clipPath id="m4n2"><rect x="16" y="326" width="268" height="104" rx="18"/></clipPath>
+              <clipPath id="m4c"><rect x="80" y="326" width="200" height="104"/></clipPath>
+              <radialGradient id="m4g" cx="50%" cy="18%" r="95%"><stop offset="0" stop-color="#2C4283"/><stop offset=".55" stop-color="#1F2F60"/><stop offset="1" stop-color="#1C2A55"/></radialGradient>
+              <filter id="m4sh" x="-20%" y="-30%" width="140%" height="170%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity=".3"/></filter>
+            </defs>
+            <rect width="300" height="650" rx="44" class="fi"/>
+            <g clip-path="url(#m4s)" aria-hidden="true">
+              <rect x="8" y="8" width="284" height="634" fill="url(#m4g)"/>
+              <!-- status bar, no time -->
+              <g class="fc"><rect x="218" y="33" width="3" height="5" rx="1"/><rect x="223" y="31" width="3" height="7" rx="1"/><rect x="228" y="29" width="3" height="9" rx="1"/><rect x="233" y="27" width="3" height="11" rx="1"/></g>
+              <g fill="none" stroke="var(--chalk)" stroke-width="1.8" stroke-linecap="round"><path d="M242 31.5a9.8 9.8 0 0 1 14 0"/><path d="M245.3 34.8a5.2 5.2 0 0 1 7.4 0"/></g><circle cx="249" cy="38" r="1.4" class="fc"/>
+              <rect x="262" y="27" width="22" height="11" rx="3" fill="none" stroke="var(--chalk)" stroke-width="1.5"/><rect x="264" y="29" width="14.4" height="7" rx="1.5" class="fc"/><rect x="285" y="30" width="2" height="5" rx="1" class="fc"/>
+              <!-- lock, date, clock -->
+              <use href="#i-lock" x="143" y="65" width="14" height="14" class="cc"/>
+              <text x="150" y="100" text-anchor="middle" class="b6 fc" font-size="15" data-i18n="m4.date">Τρίτη 6 Οκτωβρίου</text>
+              <text x="150" y="176" text-anchor="middle" class="d8 fc" font-size="72">08:42</text>
+              <!-- notification 1: arrival alert -->
+              <rect x="16" y="210" width="268" height="104" rx="18" class="fs" filter="url(#m4sh)"/>
+              <use href="#app-icon" x="30" y="226" width="40" height="40"/>
+              <text x="80" y="240" class="b6 fi" font-size="13">Leoforia</text>
+              <text x="268" y="240" text-anchor="end" class="b4 fm" font-size="13" data-i18n="m4.now">τώρα</text>
+              <rect x="80" y="250" width="38" height="22" rx="6" class="fa"/><text x="99" y="265" text-anchor="middle" class="d8 fw" font-size="12">040</text>
+              <text x="126" y="267" class="b6 fi" font-size="16" data-i18n="m4.n1.h">φτάνει σε 3′</text>
+              <text x="80" y="292" class="b4 fm" font-size="13" data-i18n="m4.n1.b">ΣΥΝΤΑΓΜΑ · Ώρα να ξεκινήσεις.</text>
+              <!-- notification 2: diversion -->
+              <rect x="16" y="326" width="268" height="104" rx="18" class="fs" filter="url(#m4sh)"/>
+              <rect x="16" y="326" width="5" height="104" class="fx" clip-path="url(#m4n2)"/>
+              <use href="#app-icon" x="30" y="342" width="40" height="40"/>
+              <text x="80" y="356" class="b6 fi" font-size="13">Leoforia</text>
+              <text x="268" y="356" text-anchor="end" class="b4 fm" font-size="13">07:10</text>
+              <g clip-path="url(#m4c)">
+                <text x="80" y="381" class="b6 fi" font-size="16" data-i18n="m4.n2.h">Εκτροπή 550 την Κυριακή</text>
+                <text x="80" y="404" class="b4 fm" font-size="13" data-i18n="m4.n2.b">Μαραθώνιος · 07:00–15:00</text>
+              </g>
+              <!-- lock-screen furniture -->
+              <circle cx="52" cy="586" r="24" fill="rgba(255,255,255,.16)"/><use href="#i-flash" x="41" y="575" width="22" height="22" class="cc"/>
+              <circle cx="248" cy="586" r="24" fill="rgba(255,255,255,.16)"/><use href="#i-camera" x="237" y="575" width="22" height="22" class="cc"/>
+              <rect x="95" y="628" width="110" height="4" rx="2" class="fc" opacity=".6"/>
+            </g>
+            <rect x="105" y="14" width="90" height="26" rx="13" class="fi"/>
+          </svg>
+        </figure>
+        <h3 data-i18n="feat.alerts.h3">Ειδοποίηση άφιξης</h3>
+        <!-- TODO-CLAIM: disruption feed -->
+        <p data-i18n="feat.alerts.text">Σε ειδοποιούμε λίγα λεπτά πριν φτάσει, και όταν κάτι αλλάζει.</p>
+      </article>
+    </div>
+
+    <ul class="rows">
+      <li>
+        <div class="tile"><svg aria-hidden="true" focusable="false"><use href="#i-star"/></svg></div>
+        <h3 data-i18n="feat.fav.h3">Αγαπημένα</h3>
+        <p data-i18n="feat.fav.text">Αποθήκευσε τις στάσεις και τις γραμμές σου. Μια κίνηση, κάθε μέρα.</p>
+      </li>
+      <li>
+        <div class="tile"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-search"/><rect x="11" y="13" width="20" height="12" rx="3" fill="#153CE0"/><text x="21" y="22" text-anchor="middle" class="d8" font-size="8.5" fill="#fff">040</text></svg></div>
+        <h3 data-i18n="feat.search.h3">Αναζήτηση γραμμής</h3>
+        <p data-i18n="feat.search.text">Γράψε 040, Χ95 ή το όνομα της στάσης. Τέλος.</p>
+      </li>
+      <li>
+        <div class="tile"><svg aria-hidden="true" focusable="false"><use href="#i-alert"/></svg></div>
+        <h3 data-i18n="feat.disrupt.h3">Αλλαγές και απεργίες</h3>
+        <!-- TODO-CLAIM: disruption feed -->
+        <p data-i18n="feat.disrupt.text">Απεργία, εκτροπή, κακοκαιρία; Το μαθαίνεις πριν βγεις από το σπίτι.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== HOW IT WORKS ===================== -->
+<section id="how" class="section how" aria-labelledby="how-h2">
+  <div class="container">
+    <p class="eyebrow" data-i18n="how.eyebrow">ΠΩΣ ΔΟΥΛΕΥΕΙ</p>
+    <h2 id="how-h2" data-i18n="how.h2">Ξεκινάς σε ένα λεπτό.</h2>
+    <ol class="route">
+      <li>
+        <span class="route__dot" aria-hidden="true"></span>
+        <svg class="route__icon" aria-hidden="true" focusable="false"><use href="#i-download"/></svg>
+        <span class="route__label" data-i18n="how.s1">Κατέβασε την εφαρμογή</span>
+      </li>
+      <li>
+        <span class="route__dot" aria-hidden="true"></span>
+        <svg class="route__icon" aria-hidden="true" focusable="false"><use href="#i-pin"/></svg>
+        <span class="route__label" data-i18n="how.s2">Επίτρεψε την τοποθεσία</span>
+      </li>
+      <li>
+        <span class="route__bus" aria-hidden="true"><svg aria-hidden="true" focusable="false"><use href="#pic-bus"/></svg></span>
+        <svg class="route__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-bus"/><rect x="6" y="6.5" width="12" height="4" rx="1" fill="#F19A1E"/></svg>
+        <span class="route__label" data-i18n="how.s3">Δες το λεωφορείο σου</span>
+      </li>
+    </ol>
+    <p class="note" data-i18n="how.note">Χωρίς εγγραφή, χωρίς λογαριασμό.</p>
+  </div>
+</section>
+
+<!-- ===================== COVERAGE ===================== -->
+<section id="coverage" class="section coverage" aria-labelledby="coverage-h2">
+  <div class="container">
+    <div class="coverage__text">
+      <p class="eyebrow" data-i18n="coverage.eyebrow">ΚΑΛΥΨΗ</p>
+      <h2 id="coverage-h2" data-i18n="coverage.h2">Αθήνα και Θεσσαλονίκη.</h2>
+      <!-- TODO-CLAIM: Thessaloniki at launch -->
+      <p data-i18n="coverage.text">Λεωφορεία και τρόλεϊ ΟΑΣΑ στην Αθήνα, λεωφορεία ΟΑΣΘ στη Θεσσαλονίκη. Σύντομα κι άλλες πόλεις.</p>
+        <div class="badges">
+          <a class="badge" href="https://apps.apple.com/gr/app/leoforia/id0000000000" target="_self" rel="noopener" data-store="ios" aria-label="Διαθέσιμο στο App Store" data-i18n-aria="badge.ios.aria">
+            <svg viewBox="0 0 180 54" aria-hidden="true" focusable="false">
+              <rect x=".5" y=".5" width="179" height="53" rx="8" fill="#000" stroke="#A6A6A6" stroke-width="1"/>
+              <g transform="translate(14 15)"><path fill="#FFF" d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></g>
+              <text x="48" y="22" class="b4" font-size="11" fill="#FFF" data-i18n="badge.ios.top">Διαθέσιμο στο</text>
+              <text x="48" y="43" class="b6" font-size="21" fill="#FFF">App Store</text>
+            </svg>
+          </a>
+          <a class="badge" href="https://play.google.com/store/apps/details?id=gr.leoforia.app" target="_self" rel="noopener" data-store="android" aria-label="Διαθέσιμο στο Google Play" data-i18n-aria="badge.play.aria">
+            <svg viewBox="0 0 180 54" aria-hidden="true" focusable="false">
+              <rect x=".5" y=".5" width="179" height="53" rx="8" fill="#000" stroke="#A6A6A6" stroke-width="1"/>
+              <g transform="translate(12 15)" stroke-linejoin="round"><polygon points="3,2 13.5,12 3,22" fill="#00D7FE"/><polygon points="3,2 16.7,9.6 13.5,12" fill="#00F076"/><polygon points="3,22 13.5,12 16.7,14.4" fill="#FF3A44"/><polygon points="13.5,12 16.7,9.6 21,12 16.7,14.4" fill="#FFC900"/></g>
+              <text x="48" y="22" class="b4" font-size="10" letter-spacing=".4" fill="#FFF" data-i18n="badge.play.top">ΔΙΑΘΕΣΙΜΟ ΣΤΟ</text>
+              <text x="48" y="43" class="b6" font-size="19" fill="#FFF">Google Play</text>
+            </svg>
+          </a>
+        </div>
+    </div>
+    <svg class="map" viewBox="0 0 400 400" role="img" aria-labelledby="map-t" focusable="false">
+      <title id="map-t" data-i18n="coverage.map.title">Χάρτης της Ελλάδας με την Αθήνα και τη Θεσσαλονίκη</title>
+      <g aria-hidden="true">
+        <g fill="var(--tile)" stroke="#C9D3EA" stroke-width="1" stroke-linejoin="round">
+          <path d="M44 124L46 132L52 144L67 162L82 185L97 194L114 193L140 191L164 216L162 218L113 198L110 201L92 234L107 256L109 279L120 281L126 267L143 303L147 283L174 301L168 287L159 260L157 238L165 219L181 215L194 218L210 234L209 206L198 196L189 190L156 172L176 157L168 140L148 88L163 69L178 91L183 107L207 107L226 96L202 83L196 69L226 53L239 58L290 58L298 63L311 11L252 30L187 28L122 33L78 58L61 99Z"/>
+          <path d="M159 162L178 157L209 176L233 215L213 195L196 193L178 173Z"/>
+          <path d="M188 365L194 352L210 352L229 359L258 361L300 369L309 363L285 379L241 380L195 367Z"/>
+          <ellipse cx="31" cy="127" rx="3" ry="7"/><circle cx="63" cy="176" r="2.5"/><circle cx="61" cy="204" r="4"/><circle cx="74" cy="226" r="3"/><circle cx="165" cy="314" r="2.5"/>
+          <circle cx="237" cy="66" r="3"/><circle cx="274" cy="80" r="2.5"/><circle cx="261" cy="110" r="3"/><circle cx="309" cy="149" r="5"/><circle cx="296" cy="193" r="4"/><circle cx="331" cy="228" r="3"/><circle cx="300" cy="237" r="2.5"/>
+          <circle cx="233" cy="165" r="2.5"/><circle cx="248" cy="223" r="2.5"/><circle cx="259" cy="237" r="2.5"/><circle cx="268" cy="245" r="2.5"/><circle cx="274" cy="267" r="3"/><circle cx="259" cy="265" r="2.5"/><circle cx="226" cy="286" r="2.5"/><circle cx="270" cy="303" r="2.5"/>
+          <circle cx="344" cy="278" r="2.5"/><ellipse cx="383" cy="308" rx="4" ry="6"/><ellipse cx="346" cy="347" rx="2" ry="5"/>
+        </g>
+        <circle cx="163" cy="69" r="6" fill="#000080" stroke="#fff" stroke-width="2"/>
+        <rect x="173" y="58" width="118" height="22" rx="6" fill="#000080"/>
+        <text x="232" y="74" text-anchor="middle" class="d8" font-size="13" fill="#fff" data-i18n="coverage.pin.thess">ΘΕΣΣΑΛΟΝΙΚΗ</text>
+        <circle cx="197" cy="216" r="6" fill="var(--accent)" stroke="#fff" stroke-width="2"/>
+        <rect x="207" y="205" width="72" height="22" rx="6" fill="var(--accent)"/>
+        <text x="243" y="221" text-anchor="middle" class="d8" font-size="13" fill="#fff" data-i18n="coverage.pin.ath">ΑΘΗΝΑ</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ===================== FAQ ===================== -->
+<section id="faq" class="section faq" aria-labelledby="faq-h2">
+  <div class="container">
+    <div class="narrow">
+      <h2 id="faq-h2" data-i18n="faq.h2">Συχνές ερωτήσεις</h2>
+      <details>
+        <summary><span data-i18n="faq.1.q">Είναι δωρεάν;</span><svg aria-hidden="true" focusable="false"><use href="#i-chev-d"/></svg></summary>
+        <p class="answer" data-i18n="faq.1.a">Ναι, δωρεάν και χωρίς εγγραφή.</p>
+      </details>
+      <details>
+        <summary><span data-i18n="faq.2.q">Σε ποιες πόλεις δουλεύει;</span><svg aria-hidden="true" focusable="false"><use href="#i-chev-d"/></svg></summary>
+        <p class="answer" data-i18n="faq.2.a">Αθήνα (λεωφορεία και τρόλεϊ ΟΑΣΑ) και Θεσσαλονίκη (ΟΑΣΘ). Άλλες πόλεις ακολουθούν.</p>
+      </details>
+      <details>
+        <summary><span data-i18n="faq.3.q">Χρειάζεται ίντερνετ;</span><svg aria-hidden="true" focusable="false"><use href="#i-chev-d"/></svg></summary>
+        <!-- TODO-CLAIM: offline lines/stops -->
+        <p class="answer" data-i18n="faq.3.a">Για τα ζωντανά λεπτά, ναι. Γραμμές και στάσεις μένουν στο κινητό σου και χωρίς σήμα.</p>
+      </details>
+      <details>
+        <summary><span data-i18n="faq.4.q">Από πού είναι τα δεδομένα;</span><svg aria-hidden="true" focusable="false"><use href="#i-chev-d"/></svg></summary>
+        <!-- TODO-CLAIM: data source agreement -->
+        <p class="answer" data-i18n="faq.4.a">Από την τηλεματική του ΟΑΣΑ και του ΟΑΣΘ. Η Leoforia είναι ανεξάρτητη εφαρμογή.</p>
+      </details>
+      <details>
+        <summary><span data-i18n="faq.5.q">Τι δεδομένα συλλέγετε;</span><svg aria-hidden="true" focusable="false"><use href="#i-chev-d"/></svg></summary>
+        <!-- TODO-LEGAL: must match the privacy policy -->
+        <p class="answer" data-i18n="faq.5.a">Μόνο την τοποθεσία σου όσο η εφαρμογή είναι ανοιχτή, για τις στάσεις κοντά σου.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DOWNLOAD ===================== -->
+<!-- TEMPORARY recreation. Replace with the official SVG/PNG badges from toolbox.marketingtools.apple.com/app-store/ and play.google.com/intl/en_us/badges/ (language: Ελληνικά) before launch; do not modify the official files. -->
+<section id="download" class="section download" aria-labelledby="download-h2">
+  <div class="container">
+    <div class="panel">
+      <div class="panel__text">
+        <ul class="ribbon" aria-hidden="true">
+          <li class="pill">040</li><li class="pill">550</li><li class="pill">Χ95</li><li class="pill pill--trolley">11</li><li class="pill pill--night">500</li><li class="pill pill--thess">03K</li><li class="pill pill--thess">10</li><li class="pill pill--thess">12</li>
+        </ul>
+        <h2 id="download-h2" data-i18n="download.h2">Μη χάσεις το λεωφορείο.</h2>
+        <p class="lead" data-i18n="download.lead">Κατέβασε το Leoforia δωρεάν, σε iPhone και Android.</p>
+        <div class="badges">
+          <a class="badge" href="https://apps.apple.com/gr/app/leoforia/id0000000000" target="_self" rel="noopener" data-store="ios" aria-label="Διαθέσιμο στο App Store" data-i18n-aria="badge.ios.aria">
+            <svg viewBox="0 0 180 54" aria-hidden="true" focusable="false">
+              <rect x=".5" y=".5" width="179" height="53" rx="8" fill="#000" stroke="#A6A6A6" stroke-width="1"/>
+              <g transform="translate(14 15)"><path fill="#FFF" d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></g>
+              <text x="48" y="22" class="b4" font-size="11" fill="#FFF" data-i18n="badge.ios.top">Διαθέσιμο στο</text>
+              <text x="48" y="43" class="b6" font-size="21" fill="#FFF">App Store</text>
+            </svg>
+          </a>
+          <a class="badge" href="https://play.google.com/store/apps/details?id=gr.leoforia.app" target="_self" rel="noopener" data-store="android" aria-label="Διαθέσιμο στο Google Play" data-i18n-aria="badge.play.aria">
+            <svg viewBox="0 0 180 54" aria-hidden="true" focusable="false">
+              <rect x=".5" y=".5" width="179" height="53" rx="8" fill="#000" stroke="#A6A6A6" stroke-width="1"/>
+              <g transform="translate(12 15)" stroke-linejoin="round"><polygon points="3,2 13.5,12 3,22" fill="#00D7FE"/><polygon points="3,2 16.7,9.6 13.5,12" fill="#00F076"/><polygon points="3,22 13.5,12 16.7,14.4" fill="#FF3A44"/><polygon points="13.5,12 16.7,9.6 21,12 16.7,14.4" fill="#FFC900"/></g>
+              <text x="48" y="22" class="b4" font-size="10" letter-spacing=".4" fill="#FFF" data-i18n="badge.play.top">ΔΙΑΘΕΣΙΜΟ ΣΤΟ</text>
+              <text x="48" y="43" class="b6" font-size="19" fill="#FFF">Google Play</text>
+            </svg>
+          </a>
+        </div>
+      </div>
+      <figure class="plate">
+        <svg viewBox="0 0 200 360" role="img" aria-labelledby="plate-t" focusable="false">
+          <title id="plate-t" data-i18n="download.plate.title">Πινακίδα στάσης Σύνταγμα με σύνδεσμο λήψης της εφαρμογής</title>
+          <g aria-hidden="true">
+            <rect x="97" y="300" width="6" height="60" fill="#9AA3B8"/>
+            <rect x="10" y="8" width="180" height="292" rx="8" fill="var(--accent)"/>
+            <rect x="16" y="14" width="168" height="280" rx="6" fill="none" stroke="#FFFFFF" stroke-width="1.5"/>
+            <use href="#pic-bus" x="86" y="28" width="28" height="28" class="cw"/>
+            <text x="100" y="82" text-anchor="middle" class="d8" font-size="20" fill="#fff">ΣΥΝΤΑΓΜΑ</text>
+            <rect x="30" y="94" width="140" height="1" fill="rgba(255,255,255,.6)"/>
+            <text class="d8" font-size="16" fill="#fff" text-anchor="middle"><tspan x="100" y="118">040</tspan><tspan x="100" y="142">550</tspan><tspan x="100" y="166">Χ95</tspan><tspan x="100" y="190">Α2</tspan></text>
+            <!-- TODO-QR: replace this group with a real QR SVG path (ECC M, 29×29 modules fit 112×84 as 84×84 centred) encoding https://www.leoforia.gr/get, generated offline (e.g. npm qrcode: qrcode.toString(url,{type:'svg',margin:0})). -->
+            <g>
+              <rect x="44" y="204" width="112" height="84" rx="6" fill="#fff"/>
+              <text x="100" y="240" text-anchor="middle" class="d8 fi" font-size="17">leoforia.gr</text>
+              <text x="100" y="262" text-anchor="middle" class="d8 fa" font-size="17">/get</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption data-i18n="download.scan">Σκάναρε με το κινητό σου</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer id="footer" class="footer">
+  <div class="container">
+    <div class="row1">
+      <div>
+        <a class="brand" href="/">
+          <svg class="logo-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false">
+            <rect x="3" y="5" width="26" height="20" rx="7" fill="#153CE0"/>
+            <rect x="8" y="8.5" width="16" height="3" rx="1.5" fill="#F19A1E"/>
+            <rect x="7.5" y="13.5" width="7.5" height="6" rx="1.5" fill="#FFFFFF"/>
+            <rect x="17" y="13.5" width="7.5" height="6" rx="1.5" fill="#FFFFFF"/>
+            <circle cx="9.5" cy="22.5" r="1.6" fill="#FFFFFF"/>
+            <circle cx="22.5" cy="22.5" r="1.6" fill="#FFFFFF"/>
+            <circle cx="10" cy="27" r="2.6" fill="#F4F6FB"/>
+            <circle cx="22" cy="27" r="2.6" fill="#F4F6FB"/>
+          </svg>
+          <span>Leoforia</span>
+        </a>
+        <p class="tagline" data-i18n="footer.tagline">Λεωφορεία live, Αθήνα &amp; Θεσσαλονίκη</p>
+      </div>
+      <div class="lang lang--inverse js-only" role="group" aria-label="Γλώσσα" data-i18n-aria="lang.label">
+        <button type="button" class="lang__btn" data-lang="el" aria-pressed="true" aria-label="Ελληνικά" data-i18n-aria="lang.el.aria">EL</button>
+        <button type="button" class="lang__btn" data-lang="en" aria-pressed="false" aria-label="English" data-i18n-aria="lang.en.aria">EN</button>
+      </div>
+    </div>
+    <nav aria-label="Νομικά" data-i18n-aria="footer.nav">
+      <ul>
+        <li><a href="/privacy" data-i18n="footer.privacy">Πολιτική Απορρήτου</a></li>
+        <li><a href="/terms" data-i18n="footer.terms">Όροι Χρήσης</a></li>
+        <li><a href="mailto:hello@leoforia.gr" data-i18n="footer.contact">Επικοινωνία</a></li>
+      </ul>
+      <!-- TODO-LEGAL: /privacy and /terms must resolve (200) before any campaign; email placeholder -->
+    </nav>
+    <div class="legal">
+      <!-- TODO-LEGAL: legal entity name, registered address -->
+      <p data-i18n="footer.entity">Leoforia ΙΚΕ · Αθήνα, Ελλάδα</p>
+      <p data-i18n="footer.copy">© 2026 Leoforia</p>
+      <p data-i18n="footer.indie">Ανεξάρτητη εφαρμογή, χωρίς σχέση με ΟΑΣΑ, ΟΣΥ ή ΟΑΣΘ/ΟΣΕΘ. Δεδομένα: ΟΑΣΑ, ΟΑΣΘ.</p>
+      <p lang="en" data-i18n="footer.tm">Apple and the Apple logo are trademarks of Apple Inc. App Store is a service mark of Apple Inc. Google Play and the Google Play logo are trademarks of Google LLC.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== STICKY BAR (mobile) ===================== -->
+<div id="sticky-bar" class="sticky js-only" role="region" aria-label="Λήψη εφαρμογής" data-i18n-aria="sticky.aria" aria-hidden="true" inert>
+  <svg class="sticky__icon" aria-hidden="true" focusable="false"><use href="#app-icon"/></svg>
+  <div>
+    <div class="sticky__name">Leoforia</div>
+    <div class="sticky__sub" data-i18n="sticky.sub">Δωρεάν · Αθήνα &amp; Θεσσαλονίκη</div>
+  </div>
+  <a id="cta-sticky" class="btn btn--sm" href="#download" data-cta data-i18n="sticky.cta">Κατέβασε</a>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var I18N = {
+    el: {
+      'meta.title': 'Leoforia – Λεωφορεία live στην Αθήνα & Θεσσαλονίκη',
+      'meta.description': 'Δες πού είναι το λεωφορείο σου και σε πόσα λεπτά έρχεται. Δωρεάν εφαρμογή για Αθήνα (ΟΑΣΑ) και Θεσσαλονίκη (ΟΑΣΘ).',
+      'a11y.skip': 'Μετάβαση στο περιεχόμενο', 'header.download': 'Κατέβασε', 'lang.label': 'Γλώσσα', 'lang.el.aria': 'Ελληνικά', 'lang.en.aria': 'English',
+      'hero.eyebrow': 'ΖΩΝΤΑΝΑ · ΑΘΗΝΑ · ΘΕΣΣΑΛΟΝΙΚΗ', 'hero.h1': 'ΠΟΥ ΕΙΝΑΙ ΤΟ ΛΕΩΦΟΡΕΙΟ;', 'hero.lead': 'Ξέρεις πότε έρχεται. Δωρεάν, για Αθήνα και Θεσσαλονίκη.',
+      'cta.primary': 'Κατέβασε την εφαρμογή', 'badge.ios.aria': 'Διαθέσιμο στο App Store', 'badge.play.aria': 'Διαθέσιμο στο Google Play', 'badge.ios.top': 'Διαθέσιμο στο', 'badge.play.top': 'ΔΙΑΘΕΣΙΜΟ ΣΤΟ',
+      'trust.h2': 'Με μια ματιά', 'trust.free': 'Δωρεάν', 'trust.nosignup': 'Χωρίς εγγραφή', 'trust.cities': 'Αθήνα · Θεσσαλονίκη', 'trust.live': 'Ζωντανά δεδομένα', 'trust.indie': 'Ανεξάρτητη εφαρμογή',
+      'live.eyebrow': 'ΖΩΝΤΑΝΑ', 'live.h2': 'Το βλέπεις να έρχεται.', 'live.lead': 'Το λεωφορείο κινείται στον χάρτη, όπως στον δρόμο. Και ξέρεις πάντα πότε ενημερώθηκε.',
+      'live.l1.chip': 'ΖΩΝΤΑΝΑ', 'live.l1.text': 'Σήμα από το λεωφορείο αυτή τη στιγμή.', 'live.l2.chip': 'ΠΡΟΓΡΑΜΜΑ', 'live.l2.text': 'Χωρίς σήμα, βλέπεις την ώρα του δρομολογίου.',
+      'live.l3.pre': 'πριν ', 'live.l3.post': '', 'live.l3.text': 'Πάντα ξέρεις πότε ενημερώθηκε.',
+      'features.eyebrow': 'ΛΕΙΤΟΥΡΓΙΕΣ', 'features.h2': 'Ό,τι χρειάζεσαι στη στάση.', 'features.lead': 'Απλά πράγματα που δουλεύουν κάθε μέρα.',
+      'feat.nearby.h3': 'Στάσεις κοντά σου', 'feat.nearby.text': 'Άνοιξε την εφαρμογή και δες τις στάσεις γύρω σου αμέσως.',
+      'feat.alerts.h3': 'Ειδοποίηση άφιξης', 'feat.alerts.text': 'Σε ειδοποιούμε λίγα λεπτά πριν φτάσει, και όταν κάτι αλλάζει.',
+      'feat.fav.h3': 'Αγαπημένα', 'feat.fav.text': 'Αποθήκευσε τις στάσεις και τις γραμμές σου. Μια κίνηση, κάθε μέρα.',
+      'feat.search.h3': 'Αναζήτηση γραμμής', 'feat.search.text': 'Γράψε 040, Χ95 ή το όνομα της στάσης. Τέλος.',
+      'feat.disrupt.h3': 'Αλλαγές και απεργίες', 'feat.disrupt.text': 'Απεργία, εκτροπή, κακοκαιρία; Το μαθαίνεις πριν βγεις από το σπίτι.',
+      'how.eyebrow': 'ΠΩΣ ΔΟΥΛΕΥΕΙ', 'how.h2': 'Ξεκινάς σε ένα λεπτό.', 'how.s1': 'Κατέβασε την εφαρμογή', 'how.s2': 'Επίτρεψε την τοποθεσία', 'how.s3': 'Δες το λεωφορείο σου', 'how.note': 'Χωρίς εγγραφή, χωρίς λογαριασμό.',
+      'coverage.eyebrow': 'ΚΑΛΥΨΗ', 'coverage.h2': 'Αθήνα και Θεσσαλονίκη.', 'coverage.text': 'Λεωφορεία και τρόλεϊ ΟΑΣΑ στην Αθήνα, λεωφορεία ΟΑΣΘ στη Θεσσαλονίκη. Σύντομα κι άλλες πόλεις.',
+      'coverage.map.title': 'Χάρτης της Ελλάδας με την Αθήνα και τη Θεσσαλονίκη', 'coverage.pin.ath': 'ΑΘΗΝΑ', 'coverage.pin.thess': 'ΘΕΣΣΑΛΟΝΙΚΗ',
+      'faq.h2': 'Συχνές ερωτήσεις', 'faq.1.q': 'Είναι δωρεάν;', 'faq.1.a': 'Ναι, δωρεάν και χωρίς εγγραφή.',
+      'faq.2.q': 'Σε ποιες πόλεις δουλεύει;', 'faq.2.a': 'Αθήνα (λεωφορεία και τρόλεϊ ΟΑΣΑ) και Θεσσαλονίκη (ΟΑΣΘ). Άλλες πόλεις ακολουθούν.',
+      'faq.3.q': 'Χρειάζεται ίντερνετ;', 'faq.3.a': 'Για τα ζωντανά λεπτά, ναι. Γραμμές και στάσεις μένουν στο κινητό σου και χωρίς σήμα.',
+      'faq.4.q': 'Από πού είναι τα δεδομένα;', 'faq.4.a': 'Από την τηλεματική του ΟΑΣΑ και του ΟΑΣΘ. Η Leoforia είναι ανεξάρτητη εφαρμογή.',
+      'faq.5.q': 'Τι δεδομένα συλλέγετε;', 'faq.5.a': 'Μόνο την τοποθεσία σου όσο η εφαρμογή είναι ανοιχτή, για τις στάσεις κοντά σου.',
+      'download.h2': 'Μη χάσεις το λεωφορείο.', 'download.lead': 'Κατέβασε το Leoforia δωρεάν, σε iPhone και Android.', 'download.scan': 'Σκάναρε με το κινητό σου', 'download.plate.title': 'Πινακίδα στάσης Σύνταγμα με σύνδεσμο λήψης της εφαρμογής',
+      'footer.tagline': 'Λεωφορεία live, Αθήνα & Θεσσαλονίκη', 'footer.nav': 'Νομικά', 'footer.privacy': 'Πολιτική Απορρήτου', 'footer.terms': 'Όροι Χρήσης', 'footer.contact': 'Επικοινωνία',
+      'footer.entity': 'Leoforia ΙΚΕ · Αθήνα, Ελλάδα', 'footer.copy': '© 2026 Leoforia', 'footer.indie': 'Ανεξάρτητη εφαρμογή, χωρίς σχέση με ΟΑΣΑ, ΟΣΥ ή ΟΑΣΘ/ΟΣΕΘ. Δεδομένα: ΟΑΣΑ, ΟΑΣΘ.',
+      'footer.tm': 'Apple and the Apple logo are trademarks of Apple Inc. App Store is a service mark of Apple Inc. Google Play and the Google Play logo are trademarks of Google LLC.',
+      'sticky.aria': 'Λήψη εφαρμογής', 'sticky.sub': 'Δωρεάν · Αθήνα & Θεσσαλονίκη', 'sticky.cta': 'Κατέβασε',
+      'm1.title': 'Οθόνη της εφαρμογής: αφίξεις στη στάση Σύνταγμα — 040 Πειραιάς σε 2 λεπτά, 550 Παλαιό Φάληρο σε 6, Α2 Βούλα έρχεται, Α3 Γλυφάδα σε 14 από πρόγραμμα.',
+      'm1.chip.pre': 'ΖΩΝΤΑΝΑ ', 'm1.street': 'Επί της ΑΜΑΛΙΑΣ · 120 μ.', 'm1.r1.sub': '24ωρη · επόμενο 17′', 'm1.r2.sub': 'επόμενο 14′', 'm1.r3.sub': 'μέσω Λ. Αμφιθέας', 'm1.r4.sub': 'Λ. Βουλιαγμένης',
+      'm.live': 'ζωντανά', 'm.sched': 'πρόγραμμα', 'm.arriving': 'Έρχεται', 'm1.alert.h': 'Ειδοποίηση για το 040', 'm1.alert.q': 'Πόσο πριν;',
+      'tab.nearby': 'Κοντά μου', 'tab.arrivals': 'Αφίξεις', 'tab.fav': 'Αγαπημένα', 'tab.lines': 'Γραμμές',
+      'm2.title': 'Οθόνη χάρτη: δύο λεωφορεία της γραμμής 550 στη Λεωφόρο Αμαλίας και Βασιλίσσης Σοφίας, επόμενη στάση Σύνταγμα, στη στάση Χίλτον σε 3 λεπτά.',
+      'm2.dir1': 'Προς ΚΗΦΙΣΙΑ', 'm2.dir2': 'Προς Π. ΦΑΛΗΡΟ', 'm2.chip.pre': 'πριν ', 'm2.chip.post': '', 'm2.next': 'Επόμενη στάση', 'm2.your': 'Στάση ΧΙΛΤΟΝ', 'm2.min': 'λεπτά', 'm2.after': 'Επόμενα: 11′ · 19′',
+      'm2.btn': 'Ειδοποίησέ με 3′ πριν',
+      'm3.title': 'Οθόνη «Κοντά μου»: τρεις στάσεις γύρω από το Σύνταγμα με τις επόμενες αφίξεις — Σύνταγμα 120 μέτρα, Πλατεία Συντάγματος 210, Ζάππειο 380.',
+      'm3.h': 'Κοντά μου', 'm3.search': 'Γραμμή ή στάση: 040, Χ95, Χίλτον', 'm3.radius': '200 μ.', 'm3.listh': 'ΣΤΑΣΕΙΣ ΚΟΝΤΑ ΣΟΥ',
+      'm3.r1.sub': 'Επί της ΑΜΑΛΙΑΣ · 120 μ.', 'm3.r2.sub': 'Επί της ΦΙΛΕΛΛΗΝΩΝ · 210 μ.', 'm3.r3.sub': 'Επί της ΑΜΑΛΙΑΣ · 380 μ.', 'm3.arr': 'Έρχ.',
+      'm4.title': 'Κλειδωμένη οθόνη με δύο ειδοποιήσεις της Leoforia: το 040 φτάνει σε 3 λεπτά στη στάση Σύνταγμα, και εκτροπή της γραμμής 550 την Κυριακή λόγω Μαραθωνίου.',
+      'm4.date': 'Τρίτη 6 Οκτωβρίου', 'm4.now': 'τώρα', 'm4.n1.h': 'φτάνει σε 3′', 'm4.n1.b': 'ΣΥΝΤΑΓΜΑ · Ώρα να ξεκινήσεις.', 'm4.n2.h': 'Εκτροπή 550 την Κυριακή', 'm4.n2.b': 'Μαραθώνιος · 07:00–15:00'
+    },
+    en: {
+      'meta.title': 'Leoforia – Live buses in Athens & Thessaloniki',
+      'meta.description': 'See where your bus is and how many minutes away. Free app for Athens (OASA) and Thessaloniki (OASTH).',
+      'a11y.skip': 'Skip to content', 'header.download': 'Download', 'lang.label': 'Language', 'lang.el.aria': 'Greek', 'lang.en.aria': 'English',
+      'hero.eyebrow': 'LIVE · ATHENS · THESSALONIKI', 'hero.h1': 'WHERE IS THE BUS?', 'hero.lead': 'Know when it comes. Free, for Athens and Thessaloniki.',
+      'cta.primary': 'Get the app', 'badge.ios.aria': 'Download on the App Store', 'badge.play.aria': 'Get it on Google Play', 'badge.ios.top': 'Download on the', 'badge.play.top': 'GET IT ON',
+      'trust.h2': 'At a glance', 'trust.free': 'Free', 'trust.nosignup': 'No sign-up', 'trust.cities': 'Athens · Thessaloniki', 'trust.live': 'Live data', 'trust.indie': 'Independent app',
+      'live.eyebrow': 'LIVE', 'live.h2': 'Watch it come.', 'live.lead': 'The bus moves on the map, like on the street. And you always know when it was updated.',
+      'live.l1.chip': 'LIVE', 'live.l1.text': 'A signal from the bus right now.', 'live.l2.chip': 'SCHEDULED', 'live.l2.text': 'No signal? You see the timetable time.',
+      'live.l3.pre': '', 'live.l3.post': ' ago', 'live.l3.text': 'You always know when it was updated.',
+      'features.eyebrow': 'FEATURES', 'features.h2': 'Everything you need at the stop.', 'features.lead': 'Simple things that work every day.',
+      'feat.nearby.h3': 'Stops near you', 'feat.nearby.text': 'Open the app and instantly see the stops around you.',
+      'feat.alerts.h3': 'Arrival alerts', 'feat.alerts.text': 'We notify you minutes before it arrives, and when something changes.',
+      'feat.fav.h3': 'Favourites', 'feat.fav.text': 'Save your stops and lines. One tap, every day.',
+      'feat.search.h3': 'Line search', 'feat.search.text': 'Type 040, X95 or a stop name. Done.',
+      'feat.disrupt.h3': 'Disruptions and strikes', 'feat.disrupt.text': 'Strike, diversion, bad weather? Know before you leave home.',
+      'how.eyebrow': 'HOW IT WORKS', 'how.h2': 'Ready in a minute.', 'how.s1': 'Download the app', 'how.s2': 'Allow location', 'how.s3': 'See your bus', 'how.note': 'No sign-up, no account.',
+      'coverage.eyebrow': 'COVERAGE', 'coverage.h2': 'Athens and Thessaloniki.', 'coverage.text': 'OASA buses and trolleys in Athens, OASTH buses in Thessaloniki. More cities soon.',
+      'coverage.map.title': 'Map of Greece with Athens and Thessaloniki', 'coverage.pin.ath': 'ATHENS', 'coverage.pin.thess': 'THESSALONIKI',
+      'faq.h2': 'Common questions', 'faq.1.q': 'Is it free?', 'faq.1.a': 'Yes, free and no sign-up.',
+      'faq.2.q': 'Which cities does it cover?', 'faq.2.a': 'Athens (OASA buses and trolleys) and Thessaloniki (OASTH). More cities follow.',
+      'faq.3.q': 'Does it need internet?', 'faq.3.a': 'For live minutes, yes. Lines and stops stay on your phone even without signal.',
+      'faq.4.q': 'Where does the data come from?', 'faq.4.a': 'From OASA and OASTH telematics. Leoforia is an independent app.',
+      'faq.5.q': 'What data do you collect?', 'faq.5.a': 'Only your location while the app is open, to show stops near you.',
+      'download.h2': "Don't miss the bus.", 'download.lead': 'Download Leoforia free, on iPhone and Android.', 'download.scan': 'Scan with your phone', 'download.plate.title': 'Syntagma stop sign with a download link for the app',
+      'footer.tagline': 'Live buses, Athens & Thessaloniki', 'footer.nav': 'Legal', 'footer.privacy': 'Privacy Policy', 'footer.terms': 'Terms of Use', 'footer.contact': 'Contact',
+      'footer.entity': 'Leoforia IKE · Athens, Greece', 'footer.copy': '© 2026 Leoforia', 'footer.indie': 'Independent app, not affiliated with OASA, OSY or OASTH/OSETH. Data: OASA, OASTH.',
+      'footer.tm': 'Apple and the Apple logo are trademarks of Apple Inc. App Store is a service mark of Apple Inc. Google Play and the Google Play logo are trademarks of Google LLC.',
+      'sticky.aria': 'Download the app', 'sticky.sub': 'Free · Athens & Thessaloniki', 'sticky.cta': 'Get it',
+      'm1.title': 'App screen: arrivals at Syntagma stop — 040 Piraeus in 2 minutes, 550 Palaio Faliro in 6, A2 Voula arriving, A3 Glyfada in 14 from the timetable.',
+      'm1.chip.pre': 'LIVE ', 'm1.street': 'On AMALIAS · 120 m', 'm1.r1.sub': '24-hour · next 17′', 'm1.r2.sub': 'next 14′', 'm1.r3.sub': 'via L. Amfitheas', 'm1.r4.sub': 'L. Vouliagmenis',
+      'm.live': 'live', 'm.sched': 'scheduled', 'm.arriving': 'Arriving', 'm1.alert.h': 'Alert for the 040', 'm1.alert.q': 'How long before?',
+      'tab.nearby': 'Nearby', 'tab.arrivals': 'Arrivals', 'tab.fav': 'Favourites', 'tab.lines': 'Lines',
+      'm2.title': 'Map screen: two line-550 buses on Amalias and Vasilissis Sofias avenues, next stop Syntagma, at Hilton stop in 3 minutes.',
+      'm2.dir1': 'To KIFISIA', 'm2.dir2': 'To P. FALIRO', 'm2.chip.pre': '', 'm2.chip.post': ' ago', 'm2.next': 'Next stop', 'm2.your': 'Stop HILTON', 'm2.min': 'min', 'm2.after': 'Then: 11′ · 19′',
+      'm2.btn': 'Alert me 3′ before',
+      'm3.title': '"Nearby" screen: three stops around Syntagma with next arrivals — Syntagma 120 metres, Syntagma Square 210, Zappeio 380.',
+      'm3.h': 'Nearby', 'm3.search': 'Line or stop: 040, X95, Hilton', 'm3.radius': '200 m', 'm3.listh': 'STOPS NEAR YOU',
+      'm3.r1.sub': 'On AMALIAS · 120 m', 'm3.r2.sub': 'On FILELLINON · 210 m', 'm3.r3.sub': 'On AMALIAS · 380 m', 'm3.arr': 'Arr.',
+      'm4.title': 'Lock screen with two Leoforia notifications: the 040 arrives at Syntagma in 3 minutes, and line 550 is diverted on Sunday for the Marathon.',
+      'm4.date': 'Tuesday 6 October', 'm4.now': 'now', 'm4.n1.h': 'arrives in 3′', 'm4.n1.b': 'SYNTAGMA · Time to leave.', 'm4.n2.h': '550 diverted on Sunday', 'm4.n2.b': 'Athens Marathon · 07:00–15:00'
+    }
+  };
+  var doc = document, html = doc.documentElement, lang = 'el';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var params = new URLSearchParams(location.search);
+  function t(key) { var m = I18N[lang]; return (key in m) ? m[key] : I18N.el[key]; }
+  /* Chip sizing: the LIVE / «πριν 8″» chips in the mockups are right-anchored; the rect is sized to the current text. */
+  function fitChips() {
+    doc.querySelectorAll('g[data-fit]').forEach(function (g) {
+      var r = g.querySelector('rect'), c = g.querySelector('circle'), tx = g.querySelector('text');
+      if (!r || !tx || !tx.getComputedTextLength) return;
+      var right = +g.getAttribute('data-fit-right'), len = tx.getComputedTextLength(), tk = tx.querySelector('[data-tick]');
+      if (!len) return;
+      if (tk && tk.textContent.length < 2) len += 7; /* reserve the second digit of the ticker */
+      var w = Math.round(len + (c ? 36 : 20)), x = right - w;
+      r.setAttribute('width', w); r.setAttribute('x', x);
+      if (c) c.setAttribute('cx', x + 14);
+      tx.setAttribute('x', x + (c ? 26 : 10));
+    });
+  }
+
+  /* 1. Language */
+  var cyc = doc.querySelector('[data-cycle]'), cycNum = cyc && cyc.querySelector('.num'), cycState = 0;
+  function renderCycle() {
+    if (!cyc) return;
+    var arriving = cycState === 2;
+    cyc.classList.toggle('is-arriving', arriving);
+    cycNum.textContent = arriving ? t('m.arriving') : (cycState === 0 ? '2' : '1');
+  }
+  function setLang(next) {
+    lang = I18N[next] ? next : 'el';
+    doc.querySelectorAll('[data-i18n]').forEach(function (el) { var k = el.getAttribute('data-i18n'); if (k in I18N.el) el.textContent = t(k); });
+    doc.querySelectorAll('[data-i18n-aria]').forEach(function (el) { el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria'))); });
+    doc.querySelectorAll('.lang__btn').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang)); });
+    html.lang = lang;
+    doc.title = t('meta.title');
+    var md = doc.querySelector('meta[name="description"]'); if (md) md.setAttribute('content', t('meta.description'));
+    try {
+      var url = new URL(location.href);
+      if (lang === 'en') url.searchParams.set('lang', 'en'); else url.searchParams.delete('lang');
+      if (url.hash === '#en') url.hash = '';
+      history.replaceState(null, '', url.toString());
+    } catch (e) {}
+    try { localStorage.setItem('leoforia.lang', lang); } catch (e) {}
+    renderCycle();
+    fitChips();
+  }
+  var initial = params.get('lang');
+  if (initial !== 'el' && initial !== 'en') initial = location.hash === '#en' ? 'en' : null;
+  if (!initial) { try { var s = localStorage.getItem('leoforia.lang'); if (s === 'en' || s === 'el') initial = s; } catch (e) {} }
+  if (initial) setLang(initial); else fitChips();
+  doc.querySelectorAll('.lang__btn').forEach(function (b) { b.addEventListener('click', function () { setLang(b.getAttribute('data-lang')); }); });
+  if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(fitChips);
+
+  /* 2 + 3. Platform-aware CTA and UTM passthrough */
+  var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+  var utm = new URLSearchParams(); keys.forEach(function (k) { if (params.get(k)) utm.set(k, params.get(k)); });
+  var ref = utm.toString();
+  var PLAY_URL = 'https://play.google.com/store/apps/details?id=gr.leoforia.app&hl=el&gl=GR' + (ref ? '&referrer=' + encodeURIComponent(ref) : '');
+  var ct = (params.get('utm_campaign') || params.get('utm_source') || '').replace(/[^A-Za-z0-9 _.\-]/g, '').slice(0, 30);
+  var IOS_URL = 'https://apps.apple.com/gr/app/leoforia/id0000000000?pt=PROVIDER_TOKEN&mt=8' + (ct ? '&ct=' + encodeURIComponent(ct) : '');
+  // TODO-STORE: PROVIDER_TOKEN from App Store Connect; id0000000000 placeholder
+  doc.querySelectorAll('[data-store="ios"]').forEach(function (a) { a.href = IOS_URL; });
+  doc.querySelectorAll('[data-store="android"]').forEach(function (a) { a.href = PLAY_URL; });
+  var ua = navigator.userAgent;
+  var isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var isAndroid = /Android/i.test(ua);
+  var target = isIOS ? IOS_URL : isAndroid ? PLAY_URL : '#download';
+  doc.querySelectorAll('[data-cta]').forEach(function (a) { a.href = target; if (target !== '#download') a.target = '_self'; });
+  doc.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('[data-store]');
+    if (a && window.LEOFORIA_BEACON && navigator.sendBeacon) navigator.sendBeacon(window.LEOFORIA_BEACON, a.dataset.store);
+  });
+
+  /* 4. Sticky bar (mobile only) */
+  var bar = doc.getElementById('sticky-bar'), ctaRow = doc.querySelector('.hero .cta-row'), mq = window.matchMedia('(max-width: 767.98px)');
+  if (bar && ctaRow && 'IntersectionObserver' in window) {
+    var ctaGone = false, blocking = {};
+    var apply = function () {
+      var show = mq.matches && ctaGone && !blocking.download && !blocking.footer;
+      bar.classList.toggle('is-visible', show);
+      bar.setAttribute('aria-hidden', String(!show));
+      bar.toggleAttribute('inert', !show);
+      doc.body.classList.toggle('has-bar', show);
+    };
+    new IntersectionObserver(function (es) { es.forEach(function (en) { ctaGone = !en.isIntersecting && en.boundingClientRect.top < 0; }); apply(); }).observe(ctaRow);
+    var io = new IntersectionObserver(function (es) { es.forEach(function (en) { blocking[en.target.id] = en.isIntersecting; }); apply(); });
+    io.observe(doc.getElementById('download')); io.observe(doc.getElementById('footer'));
+    if (mq.addEventListener) mq.addEventListener('change', apply); else mq.addListener(apply);
+  }
+
+  /* 5. Freshness ticker and the 040 row cycle */
+  var ticks = doc.querySelectorAll('[data-tick]');
+  if (!reduce && ticks.length) {
+    var v = 8, timer = null;
+    var start = function () { if (!timer) timer = setInterval(function () { v = v >= 15 ? 3 : v + 1; ticks.forEach(function (n) { n.textContent = String(v); }); }, 1000); };
+    var stop = function () { if (timer) { clearInterval(timer); timer = null; } };
+    doc.addEventListener('visibilitychange', function () { if (doc.hidden) stop(); else start(); });
+    start();
+  }
+  if (cyc && !reduce) {
+    setInterval(function () {
+      cyc.style.opacity = '0';
+      setTimeout(function () { cycState = (cycState + 1) % 3; renderCycle(); cyc.style.opacity = '1'; }, 250);
+    }, 6000);
+  }
+})();
+</script>
+</body>
+</html>
